@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fitto — AI Product Pitch Deck</title>
+<style>
+  :root {
+    --bg: #FAF8F4;
+    --sage: #6B8F71;
+    --sage-light: #A8C5AD;
+    --sage-dark: #4A6B50;
+    --charcoal: #2D2D2D;
+    --charcoal-light: #6B6B6B;
+    --orange: #E87040;
+    --orange-light: #F5A882;
+    --white: #FFFFFF;
+    --border: #E5E0D8;
+    --card-bg: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #1a1a1a;
+    color: var(--charcoal);
+    line-height: 1.5;
+  }
+
+  /* Navigation */
+  .nav {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    background: rgba(45,45,45,0.85);
+    padding: 10px 16px;
+    border-radius: 50px;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-dot.active { background: var(--orange); transform: scale(1.3); }
+
+  .nav-btn {
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0 8px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .nav-btn:hover { opacity: 1; }
+
+  /* Slide wrapper */
+  .deck {
+    width: 100vw;
+    overflow: hidden;
+  }
+
+  .slide {
+    width: 100vw;
+    min-height: 100vh;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 80px 100px;
+    background: var(--bg);
+    position: relative;
+  }
+  .slide.active { display: flex; }
+
+  /* Slide number badge */
+  .slide-num {
+    position: absolute;
+    top: 28px;
+    right: 40px;
+    font-size: 13px;
+    color: var(--charcoal-light);
+    letter-spacing: 0.05em;
+  }
+
+  /* Section label */
+  .section-tag {
+    display: inline-block;
+    background: var(--sage);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .section-tag.orange { background: var(--orange); }
+  .section-tag.dark   { background: var(--charcoal); }
+
+  /* Titles */
+  .slide-title {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 700;
+    color: var(--charcoal);
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+  .slide-title .accent { color: var(--sage); }
+  .slide-title .orange { color: var(--orange); }
+
+  .slide-subtitle {
+    font-size: clamp(1rem, 1.8vw, 1.25rem);
+    color: var(--charcoal-light);
+    margin-bottom: 40px;
+    max-width: 640px;
+  }
+
+  /* Bullets */
+  .bullets { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  .bullets li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    color: var(--charcoal);
+    line-height: 1.5;
+  }
+  .bullets li::before {
+    content: '→';
+    color: var(--sage);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Layout helpers */
+  .slide-inner { width: 100%; max-width: 1100px; }
+  .cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+  .cols-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+  .cols-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; }
+
+  /* Cards */
+  .card {
+    background: var(--card-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 24px;
+  }
+  .card-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--charcoal-light);
+    margin-bottom: 8px;
+  }
+  .card-value {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 800;
+    color: var(--charcoal);
+    line-height: 1.1;
+  }
+  .card-desc {
+    font-size: 0.88rem;
+    color: var(--charcoal-light);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+  .card.sage  { border-color: var(--sage); }
+  .card.orange { border-color: var(--orange); }
+  .card.featured {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: white;
+  }
+  .card.featured .card-title,
+  .card.featured .card-value,
+  .card.featured .card-desc { color: white; }
+
+  /* Stat big */
+  .stat-big { text-align: center; }
+  .stat-big .num {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900;
+    color: var(--sage);
+    line-height: 1;
+  }
+  .stat-big .label {
+    font-size: 0.9rem;
+    color: var(--charcoal-light);
+    margin-top: 6px;
+  }
+
+  /* Flow diagram */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 24px 0;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .flow-node {
+    background: var(--sage);
+    color: white;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+  }
+  .flow-arrow {
+    color: var(--sage);
+    font-size: 1.4rem;
+    font-weight: 700;
+    padding: 0 4px;
+  }
+
+  /* Table */
+  .compare-table { width: 100%; border-collapse: collapse; }
+  .compare-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: white;
+  }
+  .compare-table th:first-child { background: #BBBCBE; border-radius: 8px 0 0 0; }
+  .compare-table th:last-child  { background: var(--sage); border-radius: 0 8px 0 0; }
+  .compare-table td {
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--charcoal);
+  }
+  .compare-table td:last-child { color: var(--sage); font-weight: 600; }
+  .compare-table tr:last-child td { border-bottom: none; }
+
+  /* Demo screenshot placeholders */
+  .demo-frame {
+    background: var(--charcoal);
+    border-radius: 20px;
+    overflow: hidden;
+    aspect-ratio: 9/16;
+    max-width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px 16px;
+    text-align: center;
+  }
+  .demo-frame .emoji { font-size: 2.5rem; }
+  .demo-frame .label {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.4;
+  }
+  .demo-frames { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+
+  /* Competitor map */
+  .quadrant {
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 1;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    position: relative;
+    background: var(--card-bg);
+  }
+  .q-axis-h, .q-axis-v {
+    position: absolute;
+    background: var(--border);
+  }
+  .q-axis-h { left: 10%; right: 10%; height: 1.5px; top: 50%; }
+  .q-axis-v { top: 10%; bottom: 10%; width: 1.5px; left: 50%; }
+  .q-label {
+    position: absolute;
+    font-size: 0.75rem;
+    color: var(--charcoal-light);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .q-dot {
+    position: absolute;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .q-dot-label {
+    position: absolute;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    margin-top: 14px;
+  }
+  .dot-wrapper {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .dot-wrapper .dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+  }
+  .dot-wrapper .name {
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--charcoal);
+  }
+
+  /* Responsible AI grid */
+  .ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .ai-card {
+    background: var(--card-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 24px;
+  }
+  .ai-card .icon { font-size: 2rem; margin-bottom: 12px; }
+  .ai-card .title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--charcoal);
+    margin-bottom: 8px;
+  }
+  .ai-card .desc {
+    font-size: 0.9rem;
+    color: var(--charcoal-light);
+    line-height: 1.5;
+  }
+
+  /* Timeline */
+  .timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 12.5%;
+    right: 12.5%;
+    height: 2px;
+    background: var(--sage-light);
+    z-index: 0;
+  }
+  .tl-item { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .tl-dot {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--sage);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+  .tl-dot.done { background: var(--charcoal); }
+  .tl-title { font-size: 0.85rem; font-weight: 700; text-align: center; color: var(--charcoal); }
+  .tl-desc  { font-size: 0.78rem; color: var(--charcoal-light); text-align: center; line-height: 1.4; }
+
+  /* Ask section */
+  .ask-box {
+    background: var(--charcoal);
+    border-radius: 20px;
+    padding: 40px 48px;
+    color: white;
+    margin-top: 32px;
+  }
+  .ask-box h3 { font-size: 1.1rem; font-weight: 600; opacity: 0.6; margin-bottom: 20px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .ask-items { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .ask-item { display: flex; align-items: flex-start; gap: 12px; }
+  .ask-item .icon { font-size: 1.4rem; flex-shrink: 0; }
+  .ask-item .text { font-size: 0.95rem; line-height: 1.4; opacity: 0.9; }
+
+  /* Title slide special */
+  .title-slide-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 24px;
+  }
+  .logo-mark {
+    width: 96px; height: 96px;
+    background: var(--orange);
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    box-shadow: 0 8px 32px rgba(232,112,64,0.3);
+  }
+  .title-main {
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 900;
+    color: var(--charcoal);
+    letter-spacing: -0.02em;
+  }
+  .title-tagline {
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    color: var(--charcoal-light);
+    max-width: 480px;
+  }
+  .title-hook {
+    font-size: clamp(1rem, 1.8vw, 1.3rem);
+    color: var(--charcoal);
+    font-style: italic;
+    max-width: 500px;
+    background: var(--sage);
+    color: white;
+    padding: 16px 28px;
+    border-radius: 12px;
+    line-height: 1.4;
+  }
+  .title-meta {
+    font-size: 0.85rem;
+    color: var(--charcoal-light);
+  }
+
+  /* Pricing tiers */
+  .pricing-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .pricing-card {
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 20px;
+    background: var(--card-bg);
+  }
+  .pricing-card.featured {
+    border-color: var(--sage);
+    background: var(--sage);
+    color: white;
+    transform: scale(1.03);
+  }
+  .pricing-name { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; }
+  .pricing-price { font-size: 2rem; font-weight: 800; margin: 8px 0; }
+  .pricing-card.featured .pricing-name,
+  .pricing-card.featured .pricing-price { color: white; opacity: 1; }
+  .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+  .pricing-features li { font-size: 0.85rem; display: flex; align-items: center; gap: 8px; opacity: 0.8; }
+  .pricing-features li::before { content: '✓'; font-weight: 700; flex-shrink: 0; }
+  .pricing-card.featured .pricing-features li { color: white; }
+
+  /* Highlight quote */
+  .big-quote {
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+    font-weight: 700;
+    color: var(--charcoal);
+    line-height: 1.35;
+    border-left: 4px solid var(--orange);
+    padding-left: 24px;
+    margin: 24px 0;
+  }
+
+  /* Speaker note */
+  .speaker-note {
+    position: absolute;
+    bottom: 24px;
+    left: 80px;
+    right: 80px;
+    font-size: 0.78rem;
+    color: var(--charcoal-light);
+    font-style: italic;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+  }
+  .speaker-note strong { color: var(--charcoal); }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .slide { padding: 40px 28px 90px; }
+    .cols-2, .cols-3, .cols-4 { grid-template-columns: 1fr; }
+    .ai-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .ask-items { grid-template-columns: 1fr; }
+    .timeline { grid-template-columns: 1fr 1fr; }
+    .speaker-note { left: 28px; right: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+  <!-- ===== SLIDE 1: TITLE ===== -->
+  <div class="slide active" id="slide-1">
+    <div class="title-slide-inner">
+      <div class="logo-mark">💪</div>
+      <div class="title-main">Fitto</div>
+      <div class="title-tagline">Your AI Fitness Companion — built for the people who've always struggled to start.</div>
+      <div class="title-hook">"The best fitness app is the one people actually use."</div>
+      <div class="title-meta">Graduate AI Product Course &nbsp;·&nbsp; March 2026</div>
+    </div>
+    <div class="slide-num">1 / 12</div>
+  </div>
+
+  <!-- ===== SLIDE 2: PROBLEM ===== -->
+  <div class="slide" id="slide-2">
+    <div class="slide-inner">
+      <span class="section-tag">Problem</span>
+      <div class="slide-title">Most people quit fitness apps<br><span class="accent">within 30 days.</span></div>
+      <div class="slide-subtitle">Not because they lack discipline — because the apps were never built for them.</div>
+      <div class="cols-2" style="margin-top: 32px;">
+        <ul class="bullets">
+          <li>Workouts are designed for people already in shape</li>
+          <li>No app adapts to how you feel <em>today</em></li>
+          <li>Anxiety about "doing it wrong" kills motivation before it starts</li>
+          <li>Bad days are treated as failure — not as useful data</li>
+        </ul>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="card orange">
+            <div class="card-title">Quit Rate</div>
+            <div class="card-value">80%</div>
+            <div class="card-desc">of users abandon fitness apps within their first month</div>
+          </div>
+          <div class="card sage">
+            <div class="card-title">Root Cause</div>
+            <div class="card-value" style="font-size: 1.1rem; line-height: 1.3;">Apps optimize for athletes,<br>not beginners.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">2 / 12</div>
+    <div class="speaker-note"><strong>Speaker note:</strong> Ground this in a real feeling. Most fitness app failures are emotional, not physical.</div>
+  </div>
+
+  <!-- ===== SLIDE 3: MARKET ===== -->
+  <div class="slide" id="slide-3">
+    <div class="slide-inner">
+      <span class="section-tag">Opportunity</span>
+      <div class="slide-title">A <span class="accent">$14.7B market</span> full of users being failed.</div>
+      <div class="slide-subtitle">The movement-anxious beginner is the majority of users — and the most underserved.</div>
+      <div class="cols-3" style="margin-top: 40px;">
+        <div class="stat-big">
+          <div class="num">$14.7B</div>
+          <div class="label">Global fitness app<br>market by 2028</div>
+        </div>
+        <div class="stat-big">
+          <div class="num">1 in 3</div>
+          <div class="label">Adults report anxiety<br>around exercise</div>
+        </div>
+        <div class="stat-big">
+          <div class="num">67%</div>
+          <div class="label">Average fitness app<br>abandonment rate</div>
+        </div>
+      </div>
+      <div class="big-quote" style="margin-top: 40px;">
+        This isn't a niche — it's the majority of the market<br>that existing apps are actively ignoring.
+      </div>
+    </div>
+    <div class="slide-num">3 / 12</div>
+  </div>
+
+  <!-- ===== SLIDE 4: WHY APPS FAIL ===== -->
+  <div class="slide" id="slide-4">
+    <div class="slide-inner">
+      <span class="section-tag">Problem Deep Dive</span>
+      <div class="slide-title">The problem isn't lack of content.<br>It's <span class="accent">lack of context.</span></div>
+      <div style="margin-top: 32px;">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Existing Apps</th>
+              <th>Fitto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Static workout plans</td><td>Daily adaptation to energy level</td></tr>
+            <tr><td>One-size-fits-all intensity</td><td>Starts from where you are today</td></tr>
+            <tr><td>Shame-based streak mechanics</td><td>Compassionate, skip-friendly logging</td></tr>
+            <tr><td>Ignores bad days entirely</td><td>Skip = valid, useful signal</td></tr>
+            <tr><td>No behavioral memory</td><td>AI learns your patterns over time</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="slide-num">4 / 12</div>
+    <div class="speaker-note"><strong>Speaker note:</strong> Fitto treats a skip as useful signal, not failure. That's a philosophical shift.</div>
+  </div>
+
+  <!-- ===== SLIDE 5: WHY AI ===== -->
+  <div class="slide" id="slide-5">
+    <div class="slide-inner">
+      <span class="section-tag dark">Why Now</span>
+      <div class="slide-title">AI makes <span class="accent">real-time personalization</span> possible at scale.</div>
+      <div class="slide-subtitle">This combination of capabilities wasn't available five years ago.</div>
+      <div class="cols-2" style="margin-top: 32px;">
+        <ul class="bullets">
+          <li>Understand natural language about how you feel</li>
+          <li>Learn from behavioral patterns, not just fitness metrics</li>
+          <li>Recommend with full context — history, energy, mood</li>
+          <li>Adapt in real time, session by session</li>
+          <li>Explain <em>why</em> a suggestion was made (explainable AI)</li>
+        </ul>
+        <div style="display: flex; flex-direction: column; gap: 16px; align-items: flex-start;">
+          <div class="flow">
+            <div class="flow-node">Energy Input</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node">AI Engine</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-node">Workout</div>
+          </div>
+          <div style="font-size: 0.8rem; color: var(--charcoal-light); display: flex; align-items: center; gap: 8px;">
+            <span style="color: var(--sage); font-size: 1.2rem;">↺</span>
+            Completion & skip data feeds back into the next recommendation
+          </div>
+          <div class="card sage" style="margin-top: 8px;">
+            <div class="card-value" style="font-size: 1.1rem; line-height: 1.4;">The recommendation engine<br>is the product.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">5 / 12</div>
+  </div>
+
+  <!-- ===== SLIDE 6: PRODUCT ===== -->
+  <div class="slide" id="slide-6">
+    <div class="slide-inner">
+      <span class="section-tag orange">Product</span>
+      <div class="slide-title">Meet <span class="orange">Fitto</span></div>
+      <div class="slide-subtitle">30 seconds from open to active — no excuses, no barriers.</div>
+      <div class="cols-2" style="margin-top: 32px;">
+        <div>
+          <div style="font-size: 0.85rem; font-weight: 700; color: var(--charcoal-light); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px;">Core Interaction Loop</div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="flow-node" style="text-align: left; background: var(--bg); color: var(--charcoal); border: 1.5px solid var(--border);">1. How's your energy today? &nbsp;<strong style="color:var(--orange)">Low / Medium / High</strong></div>
+            <div style="padding-left: 16px; color: var(--sage); font-size: 1.2rem;">↓</div>
+            <div class="flow-node" style="text-align: left; background: var(--bg); color: var(--charcoal); border: 1.5px solid var(--border);">2. AI suggests a tailored workout</div>
+            <div style="padding-left: 16px; color: var(--sage); font-size: 1.2rem;">↓</div>
+            <div class="flow-node" style="text-align: left; background: var(--bg); color: var(--charcoal); border: 1.5px solid var(--border);">3. Tap to start — timer begins</div>
+            <div style="padding-left: 16px; color: var(--sage); font-size: 1.2rem;">↓</div>
+            <div class="flow-node" style="text-align: left; background: var(--bg); color: var(--charcoal); border: 1.5px solid var(--border);">4. Done ✓ or Skip — both logged, both valid</div>
+            <div style="padding-left: 16px; color: var(--sage); font-size: 1.2rem;">↓</div>
+            <div class="flow-node" style="text-align: left; background: var(--sage); color: white; border: 1.5px solid var(--sage);">5. Next recommendation adapts automatically</div>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="card">
+            <div class="card-title">💪 Fitto Classic</div>
+            <div class="card-desc" style="font-size: 0.95rem; color: var(--charcoal);">Character companion, gamified streaks, XP rewards. Duolingo-style motivation for habit builders.</div>
+          </div>
+          <div class="card sage">
+            <div class="card-title" style="color: rgba(255,255,255,0.7);">🌿 Fitto Gentle</div>
+            <div class="card-desc" style="font-size: 0.95rem; color: white;">Anxiety-first, breath-first, judgment-free. Designed for days when showing up is the whole workout.</div>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--charcoal-light); line-height: 1.5; padding: 12px 0; border-top: 1px solid var(--border);">
+            Two prototypes demonstrate the full vision →
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">6 / 12</div>
+  </div>
+
+  <!-- ===== SLIDE 7: DEMO 1 ===== -->
+  <div class="slide" id="slide-7">
+    <div class="slide-inner">
+      <span class="section-tag orange">Demo 1</span>
+      <div class="slide-title">Prototype 1: <span class="accent">Full Product Experience</span></div>
+      <div class="slide-subtitle">Built with Lovable — demonstrates the complete user journey from onboarding to reward.</div>
+      <div class="cols-2" style="margin-top: 28px; align-items: flex-start;">
+        <div>
+          <ul class="bullets">
+            <li>Onboarding: gender, age range, fitness frequency</li>
+            <li>Quick self-assessment: rate exercises by difficulty</li>
+            <li>Character companion selection (Puppy, Kitty, Panda, Fox)</li>
+            <li>Daily workout draw — randomized challenge card</li>
+            <li>TAP +1 mechanic, XP rewards, streak tracking</li>
+            <li>Calendar view: completed, missed, future days</li>
+          </ul>
+          <div class="card" style="margin-top: 24px; border-color: var(--orange);">
+            <div class="card-title">Key insight shown</div>
+            <div class="card-desc" style="font-size: 0.95rem; color: var(--charcoal);">The companion makes exercise feel like a commitment to a living thing — not a chore to complete.</div>
+          </div>
+        </div>
+        <div class="demo-frames">
+          <div class="demo-frame" style="background: #2D2D2D;">
+            <div class="emoji">🐶</div>
+            <div class="label" style="font-weight: 700; color: white; font-size: 1rem;">Onboarding</div>
+            <div class="label">Gender · Age · Frequency · Character</div>
+          </div>
+          <div class="demo-frame" style="background: #3D4A3F;">
+            <div class="emoji">💪</div>
+            <div class="label" style="font-weight: 700; color: white; font-size: 1rem;">Draw Card</div>
+            <div class="label">Push-ups · 12 reps · TAP +1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">7 / 12</div>
+    <div class="speaker-note"><strong>Speaker note:</strong> Walk through onboarding → draw card → start challenge. Show the TAP +1 moment — it feels like a game.</div>
+  </div>
+
+  <!-- ===== SLIDE 8: DEMO 2 ===== -->
+  <div class="slide" id="slide-8">
+    <div class="slide-inner">
+      <span class="section-tag">Demo 2</span>
+      <div class="slide-title">Prototype 2: <span class="accent">AI Recommendation Engine</span></div>
+      <div class="slide-subtitle">Built with Claude Code — demonstrates adaptive AI logic based on energy state and history.</div>
+      <div class="cols-2" style="margin-top: 28px; align-items: flex-start;">
+        <div>
+          <ul class="bullets">
+            <li>Energy selection: Low / Medium / High</li>
+            <li>AI generates workout matched to current energy</li>
+            <li>"Why this today?" — explainable recommendation</li>
+            <li>Countdown timer with Skip option</li>
+            <li>"Nicely done" or "No worries" completion screens</li>
+            <li>Future suggestions adapt from logged behavior</li>
+          </ul>
+          <div class="card sage" style="margin-top: 24px;">
+            <div class="card-title" style="color: rgba(255,255,255,0.7);">Key AI moment</div>
+            <div class="card-desc" style="font-size: 0.95rem; color: white;">"Low" energy → Light Walk Prep.<br>"High" energy → Cardio challenge.<br>Same app. Completely different experience.</div>
+          </div>
+        </div>
+        <div class="demo-frames">
+          <div class="demo-frame" style="background: #3A3A3A;">
+            <div class="emoji">⚡</div>
+            <div class="label" style="font-weight: 700; color: white; font-size: 1rem;">Energy Select</div>
+            <div class="label">Low · Medium · High</div>
+          </div>
+          <div class="demo-frame" style="background: #2A3B2C;">
+            <div class="emoji">🌿</div>
+            <div class="label" style="font-weight: 700; color: white; font-size: 1rem;">AI Suggestion</div>
+            <div class="label">"Light Walk Prep — chosen based on your current energy and recent rhythm"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">8 / 12</div>
+    <div class="speaker-note"><strong>Speaker note:</strong> Point to the "Why this today?" feature — this is responsible AI made tangible.</div>
+  </div>
+
+  <!-- ===== SLIDE 9: BUSINESS MODEL ===== -->
+  <div class="slide" id="slide-9">
+    <div class="slide-inner">
+      <span class="section-tag dark">Business Model</span>
+      <div class="slide-title">Freemium consumer + <span class="accent">B2B wellness</span> expansion.</div>
+      <div class="pricing-grid" style="margin-top: 32px;">
+        <div class="pricing-card">
+          <div class="pricing-name">Free</div>
+          <div class="pricing-price">$0</div>
+          <ul class="pricing-features" style="color: var(--charcoal-light);">
+            <li>3 workouts per week</li>
+            <li>Basic AI suggestions</li>
+            <li>Core companion</li>
+            <li>7-day streak tracking</li>
+          </ul>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-name">Fitto Plus</div>
+          <div class="pricing-price">$9/mo</div>
+          <ul class="pricing-features">
+            <li>Unlimited sessions</li>
+            <li>Full AI personalization</li>
+            <li>Progress insights</li>
+            <li>All companions</li>
+          </ul>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-name">Fitto Pro</div>
+          <div class="pricing-price">$19/mo</div>
+          <ul class="pricing-features" style="color: var(--charcoal-light);">
+            <li>Full AI coaching</li>
+            <li>Mental wellness module</li>
+            <li>Wearable sync</li>
+            <li>Coach mode</li>
+          </ul>
+        </div>
+      </div>
+      <div style="margin-top: 24px; padding: 20px 24px; background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 14px; display: flex; gap: 32px; flex-wrap: wrap;">
+        <div>
+          <div class="card-title" style="margin-bottom: 4px;">B2B Opportunities</div>
+          <div style="font-size: 0.9rem; color: var(--charcoal-light);">Corporate wellness · Physical therapy clinics · Insurance partnerships</div>
+        </div>
+        <div>
+          <div class="card-title" style="margin-bottom: 4px;">Year 1 Target</div>
+          <div style="font-size: 0.9rem; color: var(--charcoal);">10,000 paying subscribers → <strong style="color: var(--sage);">$1.1M ARR</strong></div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">9 / 12</div>
+  </div>
+
+  <!-- ===== SLIDE 10: COMPETITION ===== -->
+  <div class="slide" id="slide-10">
+    <div class="slide-inner">
+      <span class="section-tag">Market</span>
+      <div class="slide-title">Fitto owns the <span class="accent">upper-right quadrant</span> — nobody else is there.</div>
+      <div class="cols-2" style="margin-top: 32px; align-items: center;">
+        <div class="quadrant">
+          <div class="q-axis-h"></div>
+          <div class="q-axis-v"></div>
+          <div class="q-label" style="top: 5%; left: 50%; transform: translateX(-50%);">High Personalization</div>
+          <div class="q-label" style="bottom: 5%; left: 50%; transform: translateX(-50%);">Low Personalization</div>
+          <div class="q-label" style="left: 2%; top: 50%; transform: translateY(-50%) rotate(-90deg);">Low Intensity</div>
+          <div class="q-label" style="right: 1%; top: 50%; transform: translateY(-50%) rotate(90deg);">High Intensity</div>
+          <!-- Peloton: high intensity, high personalization-ish but expensive -->
+          <div class="dot-wrapper" style="left: 72%; top: 28%;">
+            <div class="dot" style="background: #BBBCBE;"></div>
+            <div class="name" style="color: #777;">Peloton</div>
+          </div>
+          <!-- Nike: high intensity, low personalization -->
+          <div class="dot-wrapper" style="left: 72%; top: 72%;">
+            <div class="dot" style="background: #BBBCBE;"></div>
+            <div class="name" style="color: #777;">Nike Run</div>
+          </div>
+          <!-- Noom: low intensity, low personalization -->
+          <div class="dot-wrapper" style="left: 28%; top: 72%;">
+            <div class="dot" style="background: #BBBCBE;"></div>
+            <div class="name" style="color: #777;">Noom</div>
+          </div>
+          <!-- Fitto: high personalization, low intensity -->
+          <div class="dot-wrapper" style="left: 28%; top: 28%;">
+            <div class="dot" style="background: var(--orange); box-shadow: 0 0 0 4px rgba(232,112,64,0.25); width: 18px; height: 18px;"></div>
+            <div class="name" style="color: var(--orange); font-size: 0.85rem;">Fitto ✦</div>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="card">
+            <div class="card-title">TAM</div>
+            <div class="card-value">$14.7B</div>
+            <div class="card-desc">Global fitness app market</div>
+          </div>
+          <div class="card sage">
+            <div class="card-title" style="color: rgba(255,255,255,0.7);">SAM</div>
+            <div class="card-value">$3.2B</div>
+            <div class="card-desc" style="color: rgba(255,255,255,0.8);">Beginner / low-activity segment</div>
+          </div>
+          <div class="card orange">
+            <div class="card-title">SOM</div>
+            <div class="card-value">$120M</div>
+            <div class="card-desc">Movement-anxious users, English-speaking markets</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">10 / 12</div>
+  </div>
+
+  <!-- ===== SLIDE 11: RESPONSIBLE AI ===== -->
+  <div class="slide" id="slide-11">
+    <div class="slide-inner">
+      <span class="section-tag">Responsible AI</span>
+      <div class="slide-title">Ethics by design, <span class="accent">not compliance.</span></div>
+      <div class="slide-subtitle">Every product decision in Fitto was evaluated for its impact on vulnerable users.</div>
+      <div class="ai-grid" style="margin-top: 28px;">
+        <div class="ai-card">
+          <div class="icon">🔍</div>
+          <div class="title">Explainability</div>
+          <div class="desc">Every suggestion shows "Why this today?" — users always understand the recommendation logic. No black box decisions.</div>
+        </div>
+        <div class="ai-card" style="border-color: var(--sage);">
+          <div class="icon">🛡️</div>
+          <div class="title">Privacy First</div>
+          <div class="desc">No health data sold. On-device preference learning. GDPR and HIPAA compliant by design from day one.</div>
+        </div>
+        <div class="ai-card" style="border-color: var(--orange);">
+          <div class="icon">💚</div>
+          <div class="title">Anti-Shame Design</div>
+          <div class="desc">Skip = valid signal, not failure. No guilt streaks. Rest days explicitly acknowledged. Compassion is a product feature.</div>
+        </div>
+        <div class="ai-card">
+          <div class="icon">🎯</div>
+          <div class="title">Bounded AI Scope</div>
+          <div class="desc">Fitto does not replace doctors or therapists. Clear escalation paths for medical concerns. AI recommends, humans decide.</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">11 / 12</div>
+    <div class="speaker-note"><strong>Speaker note:</strong> Anti-shame design is a core differentiator, not an afterthought. These were deliberate product choices.</div>
+  </div>
+
+  <!-- ===== SLIDE 12: ROADMAP & ASK ===== -->
+  <div class="slide" id="slide-12">
+    <div class="slide-inner">
+      <span class="section-tag">Roadmap & Ask</span>
+      <div class="slide-title">Building toward <span class="accent">10,000 users</span> who actually stay.</div>
+      <div class="timeline" style="margin-top: 32px; margin-bottom: 40px;">
+        <div class="tl-item">
+          <div class="tl-dot done">NOW</div>
+          <div class="tl-title">MVP</div>
+          <div class="tl-desc">AI engine ✓<br>2 prototypes ✓<br>Core loop ✓</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot">Q3 '26</div>
+          <div class="tl-title">Beta Launch</div>
+          <div class="tl-desc">Wearable sync<br>1K beta users<br>Feedback loops</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot">Q1 '27</div>
+          <div class="tl-title">1.0 Release</div>
+          <div class="tl-desc">Voice interface<br>Mental wellness<br>Coach mode</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot">Q3 '27</div>
+          <div class="tl-title">Scale</div>
+          <div class="tl-desc">B2B pilots<br>50K users<br>Series A</div>
+        </div>
+      </div>
+      <div class="ask-box">
+        <h3>What we're looking for</h3>
+        <div class="ask-items">
+          <div class="ask-item">
+            <span class="icon">🎓</span>
+            <span class="text"><strong>Mentorship</strong> from advisors in fitness-tech and AI product</span>
+          </div>
+          <div class="ask-item">
+            <span class="icon">🤝</span>
+            <span class="text"><strong>Pilot partners</strong> — corporate wellness or PT clinics</span>
+          </div>
+          <div class="ask-item">
+            <span class="icon">🔬</span>
+            <span class="text"><strong>Research access</strong> — anxiety and behavior change literature</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">12 / 12</div>
+    <div class="speaker-note"><strong>Speaker note:</strong> End with conviction. You're not pitching a feature — you're pitching a belief that fitness tech has been solving the wrong problem.</div>
+  </div>
+
+</div><!-- end .deck -->
+
+<!-- Navigation -->
+<div class="nav" id="nav">
+  <button class="nav-btn" onclick="changeSlide(-1)">‹</button>
+  <div id="dots"></div>
+  <button class="nav-btn" onclick="changeSlide(1)">›</button>
+</div>
+
+<script>
+  const totalSlides = 12;
+  let current = 1;
+
+  function buildDots() {
+    const c = document.getElementById('dots');
+    for (let i = 1; i <= totalSlides; i++) {
+      const d = document.createElement('div');
+      d.className = 'nav-dot' + (i === 1 ? ' active' : '');
+      d.onclick = () => goTo(i);
+      c.appendChild(d);
+    }
+  }
+
+  function goTo(n) {
+    document.getElementById('slide-' + current).classList.remove('active');
+    document.querySelectorAll('.nav-dot')[current - 1].classList.remove('active');
+    current = Math.max(1, Math.min(totalSlides, n));
+    document.getElementById('slide-' + current).classList.add('active');
+    document.querySelectorAll('.nav-dot')[current - 1].classList.add('active');
+  }
+
+  function changeSlide(dir) { goTo(current + dir); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   changeSlide(-1);
+  });
+
+  buildDots();
+</script>
+</body>
+</html>
