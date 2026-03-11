@@ -79,6 +79,30 @@ export function getRhythmLast7Days(
   return days;
 }
 
+/** Returns a fixed Sun–Sat week for the current week, with done/skip counts per day. */
+export function getCurrentWeekRhythm(
+  events: FittoEvent[]
+): { date: string; done: number; skip: number }[] {
+  const today = new Date();
+  const dayOfWeek = today.getDay(); // 0 = Sun
+  const sunday = new Date(today);
+  sunday.setDate(today.getDate() - dayOfWeek);
+
+  const days: { date: string; done: number; skip: number }[] = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(sunday);
+    d.setDate(sunday.getDate() + i);
+    const dateStr = d.toISOString().slice(0, 10);
+    const dayEvents = events.filter((e) => e.at.slice(0, 10) === dateStr);
+    days.push({
+      date: dateStr,
+      done: dayEvents.filter((e) => e.type === "done").length,
+      skip: dayEvents.filter((e) => e.type === "skip").length,
+    });
+  }
+  return days;
+}
+
 export interface StreakInfo {
   count: number;
   lastEventWasSkip: boolean;

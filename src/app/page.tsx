@@ -12,7 +12,7 @@ import {
   clearState,
   countSkipsLast7Days,
   countCompletionsLast7Days,
-  getRhythmLast7Days,
+  getCurrentWeekRhythm,
   getStreakInfo,
   FittoState,
 } from "@/lib/storage";
@@ -149,7 +149,7 @@ export default function HomePage() {
 
   const skips = countSkipsLast7Days(state.events);
   const completions = countCompletionsLast7Days(state.events);
-  const rhythm = getRhythmLast7Days(state.events);
+  const rhythm = getCurrentWeekRhythm(state.events);
   const streak = getStreakInfo(state.events);
 
   // State-based streak copy (number lives in left card only — right side is emotional)
@@ -399,13 +399,13 @@ export default function HomePage() {
               />
               {/* Lucide Flame icon */}
               <Flame
-                className={`relative h-6 w-6 ${
+                className={`relative h-7 w-7 ${
                   streak.count > 0
                     ? "animate-flame-breathe text-fitto-accent"
                     : "text-fitto-muted/30"
                 }`}
-                fill={streak.count > 0 ? "currentColor" : "none"}
-                strokeWidth={1.5}
+                fill="none"
+                strokeWidth={1.75}
               />
               {/* Streak number */}
               <span
