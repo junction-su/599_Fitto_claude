@@ -380,11 +380,12 @@ export default function HomePage() {
         </h2>
         <div
           className="grid grid-cols-[120px_1fr] rounded-2xl bg-fitto-card p-3"
+          style={{ marginBottom: 1 }}
         >
           {/* Left column: streak card spanning both rows */}
           <div
             className="row-span-2 mr-3 flex flex-col items-center justify-center rounded-xl bg-fitto-bg"
-            style={{ marginTop: 1 }}
+            style={{ marginTop: 2, marginBottom: 2 }}
           >
             {/* Flame + glow */}
             <div className="relative flex items-center justify-center">
@@ -403,6 +404,7 @@ export default function HomePage() {
                 className={`relative h-12 w-12 ${
                   streak.count > 0 ? "animate-flame-breathe" : ""
                 }`}
+                style={{ marginTop: 2 }}
                 viewBox="0 0 65 75"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -477,8 +479,8 @@ export default function HomePage() {
                     <div
                       className="flex items-center justify-center rounded-full transition-all"
                       style={{
-                        width: hasDone ? 26 : 22,
-                        height: hasDone ? 26 : 22,
+                        width: 22,
+                        height: 22,
                         backgroundColor: hasDone
                           ? "#6F7D5A"
                           : "#D9CEBC",
