@@ -403,18 +403,18 @@ export default function HomePage() {
                   }}
                 />
               )}
-              {/* Reward flame SVG — rich solid shape with inner white cutout */}
+              {/* Flame SVG — rounded blob shape matching Figma design */}
               <svg
                 className={`relative h-12 w-12 ${
                   streak.count > 0 ? "animate-flame-breathe" : ""
                 }`}
-                viewBox="0 0 32 32"
+                viewBox="0 0 48 56"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                {/* Outer flame — warm orange, organic teardrop */}
+                {/* Outer flame — wide rounded teardrop blob */}
                 <path
-                  d="M16 3C16 3 7 11.5 7 18.5C7 23.19 10.58 27 16 27C21.42 27 25 23.19 25 18.5C25 11.5 16 3 16 3Z"
+                  d="M24 2C32 2, 46 16, 46 30C46 43, 36 54, 24 54C12 54, 2 43, 2 30C2 16, 16 2, 24 2Z"
                   fill={streak.count > 0 ? "#E87040" : "none"}
                   stroke={streak.count > 0 ? "#E87040" : "#8A8178"}
                   strokeWidth={streak.count > 0 ? 0 : 1.5}
@@ -422,10 +422,10 @@ export default function HomePage() {
                   strokeLinejoin="round"
                   opacity={streak.count > 0 ? 1 : 0.2}
                 />
-                {/* Inner white flame — rounded organic shape */}
+                {/* Inner white oval — drop shape in upper center */}
                 {streak.count > 0 && (
                   <path
-                    d="M16 14C16 14 12 18 12 20.8C12 22.56 13.79 24 16 24C18.21 24 20 22.56 20 20.8C20 18 16 14 16 14Z"
+                    d="M24 14C29 14, 35 21, 35 28C35 34, 30 39, 24 39C18 39, 13 34, 13 28C13 21, 19 14, 24 14Z"
                     fill="white"
                     opacity={0.9}
                   />
