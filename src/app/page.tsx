@@ -376,63 +376,81 @@ export default function HomePage() {
 
       {/* Your Journey */}
       <section className="mt-10">
-        <h2 className="mb-3 text-lg font-semibold text-fitto-text">
+        <h2 className="mb-2 text-lg font-semibold text-fitto-text">
           Your Journey
         </h2>
-        <div className="rounded-2xl bg-fitto-card p-5">
-          {/* Top row: compact streak card + encouragement */}
-          <div className="flex items-center gap-4">
-            {/* Compact streak card */}
-            <div className="relative flex w-[72px] shrink-0 flex-col items-center rounded-xl bg-fitto-bg/80 py-3.5">
-              {/* Subtle glow pulse behind flame */}
-              <span
-                className={`pointer-events-none absolute left-1/2 top-5 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full ${
-                  streak.count > 0 ? "animate-flame-glow" : ""
-                }`}
-                style={{
-                  background:
-                    streak.count > 0
-                      ? "radial-gradient(circle, rgba(111,125,90,0.3) 0%, transparent 70%)"
-                      : "none",
-                  filter: "blur(8px)",
-                }}
-              />
-              {/* Lucide Flame icon */}
+        <div
+          className={`rounded-2xl p-3.5 transition-colors ${
+            streak.count > 0 ? "bg-fitto-card" : "bg-fitto-card/60"
+          }`}
+        >
+          {/* Row 1: streak badge + message */}
+          <div className="flex items-center gap-3">
+            {/* Mini streak tile */}
+            <div
+              className={`relative flex w-[56px] shrink-0 flex-col items-center rounded-lg py-2 transition-colors ${
+                streak.count > 0
+                  ? "bg-fitto-accent/10"
+                  : "bg-fitto-bg/70"
+              }`}
+            >
+              {/* Warm glow behind flame (active only) */}
+              {streak.count > 0 && (
+                <span
+                  className="pointer-events-none absolute left-1/2 top-3 h-8 w-8 -translate-x-1/2 -translate-y-1/2 animate-flame-glow rounded-full"
+                  style={{
+                    background:
+                      "radial-gradient(circle, rgba(111,125,90,0.45) 0%, transparent 70%)",
+                    filter: "blur(6px)",
+                  }}
+                />
+              )}
               <Flame
-                className={`relative h-7 w-7 ${
+                className={`relative h-5 w-5 ${
                   streak.count > 0
                     ? "animate-flame-breathe text-fitto-accent"
-                    : "text-fitto-muted/30"
+                    : "text-fitto-muted/25"
                 }`}
-                fill="none"
-                strokeWidth={1.75}
+                fill={streak.count > 0 ? "currentColor" : "none"}
+                strokeWidth={streak.count > 0 ? 1.5 : 1.75}
               />
-              {/* Streak number */}
               <span
-                className={`relative mt-1 text-xl font-bold leading-tight ${
-                  streak.count > 0 ? "text-fitto-text" : "text-fitto-muted/40"
+                className={`relative mt-0.5 text-[13px] font-bold leading-none ${
+                  streak.count > 0 ? "text-fitto-text" : "text-fitto-muted/35"
                 }`}
               >
-                {streak.count}
+                {streak.count} <span className="font-semibold text-[10px]">{streak.count === 1 ? "day" : "days"}</span>
               </span>
-              <span className="relative text-[10px] text-fitto-muted">
-                {streak.count === 1 ? "day" : "days"}
+              <span
+                className={`relative text-[8px] uppercase tracking-wider ${
+                  streak.count > 0 ? "text-fitto-muted/70" : "text-fitto-muted/30"
+                }`}
+              >
+                streak
               </span>
             </div>
 
-            {/* Encouragement copy (no streak number repeated) */}
+            {/* Message block */}
             <div className="min-w-0 flex-1">
-              <h3 className="text-[15px] font-bold leading-snug text-fitto-text">
+              <h3
+                className={`text-[15px] font-bold leading-tight ${
+                  streak.count > 0 ? "text-fitto-text" : "text-fitto-muted/70"
+                }`}
+              >
                 {streakCopy.title}
               </h3>
-              <p className="mt-0.5 text-sm leading-relaxed text-fitto-muted">
+              <p
+                className={`mt-0.5 text-[13px] leading-snug ${
+                  streak.count > 0 ? "text-fitto-muted" : "text-fitto-muted/50"
+                }`}
+              >
                 {streakCopy.body}
               </p>
             </div>
           </div>
 
-          {/* Weekly progress row */}
-          <div className="mt-4 rounded-xl bg-fitto-bg/60 px-3 py-2.5">
+          {/* Row 2: compact weekly strip */}
+          <div className="mt-2.5 rounded-lg bg-fitto-bg/50 px-2.5 py-2">
             <div className="flex justify-between">
               {rhythm.map((day) => {
                 const hasDone = day.done > 0;
@@ -442,24 +460,24 @@ export default function HomePage() {
                 return (
                   <div
                     key={day.date}
-                    className="flex flex-col items-center gap-1"
+                    className="flex flex-col items-center gap-0.5"
                   >
                     <div
-                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${
+                      className={`flex h-[22px] w-[22px] items-center justify-center rounded-full transition-colors ${
                         hasDone
                           ? "bg-fitto-accent"
                           : hasSkip
-                          ? "bg-fitto-muted/15"
-                          : "bg-fitto-card"
+                          ? "bg-fitto-muted/12"
+                          : "bg-fitto-card/80"
                       }`}
                       title={`${day.date}: ${day.done} done, ${day.skip} skipped`}
                     >
                       {hasDone && (
                         <svg
-                          className="h-3.5 w-3.5 text-white"
+                          className="h-2.5 w-2.5 text-white"
                           fill="none"
                           viewBox="0 0 24 24"
-                          strokeWidth={3}
+                          strokeWidth={3.5}
                           stroke="currentColor"
                         >
                           <path
@@ -470,7 +488,7 @@ export default function HomePage() {
                         </svg>
                       )}
                     </div>
-                    <span className="text-[9px] font-medium text-fitto-muted/70">
+                    <span className="text-[8px] font-medium text-fitto-muted/60">
                       {dayLabel}
                     </span>
                   </div>
