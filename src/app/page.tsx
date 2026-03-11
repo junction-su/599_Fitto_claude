@@ -271,34 +271,36 @@ export default function HomePage() {
 
       {/* Suggestion Card Deck */}
       {recs.length > 0 && (
-        <section className="mt-8 overflow-x-hidden">
+        <section className="mt-8">
           <h2 className="mb-1.5 text-lg font-semibold text-fitto-text">
             Today&apos;s gentle suggestion
           </h2>
 
-          {/* Stacked card deck — Framer Motion, Apple Wallet style */}
-          <div className="relative" style={{ height: 400, overflow: "hidden" }}>
+          {/* Stacked card deck — Framer Motion, vertical depth stacking */}
+          {/* No overflow:hidden here — would clip the card's box-shadow */}
+          <div className="relative" style={{ height: 400 }}>
             {recs.map((cardRec, cardIdx) => {
               const stackPos = (cardIdx - recIndex + recs.length) % recs.length;
               const isFront = stackPos === 0;
 
-              // Per-position target values
-              // y offset inspired by stacked-card repo: back cards shift slightly
-              // downward, reinforcing the physical depth alongside rotation
+              // Per-position target values — pure y+scale+opacity, no rotation.
+              // Rotation was removed: it caused horizontal overflow AND fought
+              // against the y-offset, making the animation barely perceptible.
+              // Pure vertical stacking means: front card rises into view,
+              // back cards sink behind it — clearly readable at every step.
               const scale   = stackPos === 0 ? 1    : stackPos === 1 ? 0.96 : 0.92;
-              const rotate  = stackPos === 0 ? 0    : stackPos === 1 ? -12.7762 : -27.7762;
-              const opacity = stackPos === 0 ? 1    : stackPos === 1 ? 0.75 : 0.6;
-              const y       = stackPos === 0 ? 0    : stackPos === 1 ? 8    : 16;
+              const y       = stackPos === 0 ? 0    : stackPos === 1 ? 10   : 20;
+              const opacity = stackPos === 0 ? 1    : stackPos === 1 ? 0.8  : 0.6;
 
               return (
                 <motion.div
                   key={cardIdx}
-                  initial={{ scale, rotate, opacity, y }}
-                  animate={{ scale, rotate, opacity, y }}
+                  initial={{ scale, y, opacity }}
+                  animate={{ scale, y, opacity }}
                   transition={{
                     type: "tween",
                     ease: [0.22, 1, 0.36, 1],
-                    duration: 0.33,
+                    duration: 0.32,
                   }}
                   style={{
                     position: "absolute",
