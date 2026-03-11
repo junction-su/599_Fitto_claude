@@ -17,6 +17,7 @@ import {
   FittoState,
 } from "@/lib/storage";
 import Link from "next/link";
+import { Flame } from "lucide-react";
 
 const ENERGY_OPTIONS: { value: EnergyLevel; label: string }[] = [
   { value: "low", label: "Low" },
@@ -24,7 +25,7 @@ const ENERGY_OPTIONS: { value: EnergyLevel; label: string }[] = [
   { value: "high", label: "High" },
 ];
 
-const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function formatDate(): string {
   return new Date().toLocaleDateString("en-US", {
@@ -396,26 +397,16 @@ export default function HomePage() {
                   filter: "blur(8px)",
                 }}
               />
-              {/* Clean minimal flame SVG */}
-              <svg
-                viewBox="0 0 24 24"
+              {/* Lucide Flame icon */}
+              <Flame
                 className={`relative h-6 w-6 ${
                   streak.count > 0
                     ? "animate-flame-breathe text-fitto-accent"
                     : "text-fitto-muted/30"
                 }`}
-                fill="none"
-              >
-                <path
-                  d="M12 2C12 2 9.5 7.5 9.5 11c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5C14.5 7.5 12 2 12 2Z"
-                  fill="currentColor"
-                  opacity="0.5"
-                />
-                <path
-                  d="M12 22c-3.87 0-7-2.69-7-6.5 0-3.05 2.13-6.16 4.1-8.27a.5.5 0 0 1 .82.14c.6 1.32 1.5 2.34 2.36 2.9.22-.96.72-2.32 1.55-3.65C15.04 4.62 16.6 3.2 19 2a.5.5 0 0 1 .7.56c-.28 1.9-.08 3.42.48 4.66.55 1.2 1.4 2.1 2.16 2.82a.5.5 0 0 1 .1.55C21.72 12.4 20 15.5 20 15.5c0 3.31-3.13 6.5-8 6.5Z"
-                  fill="currentColor"
-                />
-              </svg>
+                fill={streak.count > 0 ? "currentColor" : "none"}
+                strokeWidth={1.5}
+              />
               {/* Streak number */}
               <span
                 className={`relative mt-1 text-xl font-bold leading-tight ${
@@ -447,10 +438,7 @@ export default function HomePage() {
                 const hasDone = day.done > 0;
                 const hasSkip = day.skip > 0 && !hasDone;
                 const dayDate = new Date(day.date + "T12:00:00");
-                const dayLabel =
-                  DAY_LABELS[
-                    dayDate.getDay() === 0 ? 6 : dayDate.getDay() - 1
-                  ];
+                const dayLabel = DAY_LABELS[dayDate.getDay()];
                 return (
                   <div
                     key={day.date}
