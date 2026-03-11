@@ -277,7 +277,7 @@ export default function HomePage() {
           </h2>
 
           {/* Stacked card deck — Framer Motion, Apple Wallet style */}
-          <div className="relative" style={{ height: 360, overflow: "hidden" }}>
+          <div className="relative" style={{ height: 400, overflow: "hidden" }}>
             {recs.map((cardRec, cardIdx) => {
               const stackPos = (cardIdx - recIndex + recs.length) % recs.length;
               const isFront = stackPos === 0;
