@@ -379,17 +379,13 @@ export default function HomePage() {
           Your Journey
         </h2>
         <div
-          className={`grid grid-cols-[120px_1fr] rounded-2xl p-3 transition-colors ${
-            streak.count > 0 ? "bg-fitto-card" : "bg-fitto-card/60"
-          }`}
+          className="grid grid-cols-[120px_1fr] rounded-2xl p-3"
+          style={{ backgroundColor: "#F5EFE6" }}
         >
           {/* Left column: streak card spanning both rows */}
           <div
-            className={`row-span-2 mr-3 flex flex-col items-center justify-center rounded-xl transition-colors ${
-              streak.count > 0
-                ? "bg-[#E87040]/10"
-                : "bg-fitto-bg/70"
-            }`}
+            className="row-span-2 mr-3 flex flex-col items-center justify-center rounded-xl"
+            style={{ backgroundColor: "#EDE3D6" }}
           >
             {/* Flame + glow */}
             <div className="relative flex items-center justify-center">
@@ -398,7 +394,7 @@ export default function HomePage() {
                   className="pointer-events-none absolute h-16 w-16 animate-flame-glow rounded-full"
                   style={{
                     background:
-                      "radial-gradient(circle, rgba(232,112,64,0.45) 0%, rgba(232,112,64,0.15) 40%, transparent 70%)",
+                      "radial-gradient(circle, rgba(232,112,64,0.3) 0%, rgba(232,112,64,0.08) 50%, transparent 70%)",
                     filter: "blur(10px)",
                   }}
                 />
@@ -467,7 +463,7 @@ export default function HomePage() {
           </div>
 
           {/* Right column, row 2: compact weekly strip */}
-          <div className="mt-1.5 rounded-lg bg-fitto-bg/50 px-2 py-1.5">
+          <div className="mt-1.5 rounded-lg px-2 py-1.5" style={{ backgroundColor: "#EDE3D6" }}>
             <div className="flex justify-between">
               {rhythm.map((day) => {
                 const hasDone = day.done > 0;
@@ -480,13 +476,15 @@ export default function HomePage() {
                     className="flex flex-col items-center gap-0.5"
                   >
                     <div
-                      className={`flex items-center justify-center rounded-full transition-all ${
-                        hasDone
-                          ? "h-[26px] w-[26px] bg-[#E87040] shadow-sm shadow-[#E87040]/25"
-                          : hasSkip
-                          ? "h-[22px] w-[22px] bg-fitto-muted/12"
-                          : "h-[22px] w-[22px] bg-fitto-card/80"
-                      }`}
+                      className="flex items-center justify-center rounded-full transition-all"
+                      style={{
+                        width: hasDone ? 26 : 22,
+                        height: hasDone ? 26 : 22,
+                        backgroundColor: hasDone
+                          ? "#E87040"
+                          : "#D9CEBC",
+                        boxShadow: hasDone ? "0 1px 4px rgba(232,112,64,0.3)" : "none",
+                      }}
                       title={`${day.date}: ${day.done} done, ${day.skip} skipped`}
                     >
                       {hasDone && (
