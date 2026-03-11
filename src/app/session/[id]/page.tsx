@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { getSessionById, Session } from "@/lib/engine/catalog";
 import { loadState, saveState, FittoEvent } from "@/lib/storage";
+import { getTagStyle } from "@/lib/tagStyle";
 import { useRouter, useParams } from "next/navigation";
 
 type Status = "active" | "done" | "skipped";
@@ -72,16 +73,21 @@ export default function SessionPage() {
   if (!session) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-fitto-accent border-t-transparent" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" style={{ borderColor: "#6F7D5A", borderTopColor: "transparent" }} />
       </div>
     );
   }
+
+  const { color: tagColor, background: tagBg } = getTagStyle(session.tag);
 
   return (
     <div className="flex min-h-[80vh] flex-col items-center justify-center pt-6">
       {status === "active" && (
         <>
-          <span className="rounded-full bg-fitto-accent/10 px-3 py-1 text-xs font-medium text-fitto-accent">
+          <span
+            className="rounded-full px-3 py-1 text-xs font-medium"
+            style={{ backgroundColor: tagBg, color: tagColor }}
+          >
             {session.tag} · {session.durationMin} min
           </span>
           <h1 className="mt-4 text-center text-2xl font-bold text-fitto-text">
@@ -109,7 +115,8 @@ export default function SessionPage() {
             </button>
             <button
               onClick={handleDone}
-              className="flex-1 rounded-xl bg-fitto-accent py-3.5 text-sm font-semibold text-white transition-colors hover:bg-fitto-accent-hover"
+              className="flex-1 rounded-xl py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              style={{ backgroundColor: tagColor }}
             >
               Done
             </button>
@@ -119,9 +126,13 @@ export default function SessionPage() {
 
       {status === "done" && (
         <div className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-fitto-accent/10">
+          <div
+            className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full"
+            style={{ backgroundColor: `${tagColor}1a` }}
+          >
             <svg
-              className="h-8 w-8 text-fitto-accent"
+              className="h-8 w-8"
+              style={{ color: tagColor }}
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={2}
@@ -142,7 +153,8 @@ export default function SessionPage() {
           </p>
           <button
             onClick={goHome}
-            className="mt-8 rounded-xl bg-fitto-accent px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-fitto-accent-hover"
+            className="mt-8 rounded-xl px-8 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            style={{ backgroundColor: tagColor }}
           >
             Back to Home
           </button>
@@ -175,7 +187,8 @@ export default function SessionPage() {
           </p>
           <button
             onClick={goHome}
-            className="mt-8 rounded-xl bg-fitto-accent px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-fitto-accent-hover"
+            className="mt-8 rounded-xl px-8 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            style={{ backgroundColor: tagColor }}
           >
             Back to Home
           </button>
