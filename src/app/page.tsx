@@ -17,7 +17,7 @@ import {
   FittoState,
 } from "@/lib/storage";
 import Link from "next/link";
-import { Flame } from "lucide-react";
+// Flame icon is now a custom SVG inline (with inner white flame shape)
 
 const ENERGY_OPTIONS: { value: EnergyLevel; label: string }[] = [
   { value: "low", label: "Low" },
@@ -396,7 +396,7 @@ export default function HomePage() {
             <div className="relative flex items-center justify-center">
               {streak.count > 0 && (
                 <span
-                  className="pointer-events-none absolute h-12 w-12 animate-flame-glow rounded-full"
+                  className="pointer-events-none absolute h-14 w-14 animate-flame-glow rounded-full"
                   style={{
                     background:
                       "radial-gradient(circle, rgba(111,125,90,0.5) 0%, transparent 70%)",
@@ -404,19 +404,40 @@ export default function HomePage() {
                   }}
                 />
               )}
-              <Flame
-                className={`relative h-8 w-8 ${
+              {/* Custom flame SVG with inner white shape */}
+              <svg
+                className={`relative h-10 w-10 ${
                   streak.count > 0
-                    ? "animate-flame-breathe text-fitto-accent"
-                    : "text-fitto-muted/25"
+                    ? "animate-flame-breathe"
+                    : ""
                 }`}
-                fill={streak.count > 0 ? "currentColor" : "none"}
-                strokeWidth={streak.count > 0 ? 1.5 : 1.75}
-              />
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* Outer flame */}
+                <path
+                  d="M12 2C12 2 6 8.5 6 13.5C6 17.09 8.69 20 12 20C15.31 20 18 17.09 18 13.5C18 8.5 12 2 12 2Z"
+                  fill={streak.count > 0 ? "#6F7D5A" : "none"}
+                  stroke={streak.count > 0 ? "#6F7D5A" : "#8A8178"}
+                  strokeWidth={1.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  opacity={streak.count > 0 ? 1 : 0.25}
+                />
+                {/* Inner white flame */}
+                {streak.count > 0 && (
+                  <path
+                    d="M12 10C12 10 9.5 13 9.5 15C9.5 16.38 10.62 17.5 12 17.5C13.38 17.5 14.5 16.38 14.5 15C14.5 13 12 10 12 10Z"
+                    fill="white"
+                    opacity={0.85}
+                  />
+                )}
+              </svg>
             </div>
-            {/* Streak count */}
+            {/* Streak count + label */}
             <span
-              className={`relative mt-1.5 text-lg font-bold leading-none ${
+              className={`relative mt-2 text-lg font-bold leading-none ${
                 streak.count > 0 ? "text-fitto-text" : "text-fitto-muted/35"
               }`}
             >
@@ -426,8 +447,8 @@ export default function HomePage() {
               </span>
             </span>
             <span
-              className={`relative mt-0.5 text-[9px] uppercase tracking-widest ${
-                streak.count > 0 ? "text-fitto-muted/70" : "text-fitto-muted/30"
+              className={`relative mt-0.5 text-[9px] tracking-wide ${
+                streak.count > 0 ? "text-fitto-muted/60" : "text-fitto-muted/30"
               }`}
             >
               streak
