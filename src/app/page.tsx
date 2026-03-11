@@ -274,7 +274,7 @@ export default function HomePage() {
       {/* Suggestion Card Deck */}
       {recs.length > 0 && (
         <section className="mt-8">
-          <h2 className="mb-5 text-lg font-semibold text-fitto-text">
+          <h2 className="mb-2.5 text-lg font-semibold text-fitto-text">
             Today&apos;s gentle suggestion
           </h2>
 
@@ -297,7 +297,7 @@ export default function HomePage() {
                     borderRadius: 32,
                     backgroundColor: isFront
                       ? "#F0ECE4"
-                      : "rgba(161,174,136,0.22)",
+                      : "rgba(161,174,136,0.2)",
                     boxShadow: isFront
                       ? "0 0 56px rgba(166,161,149,0.3)"
                       : "none",
@@ -310,8 +310,8 @@ export default function HomePage() {
                         : stackPos === 0
                         ? "rotate(0deg) scale(1)"
                         : stackPos === 1
-                        ? "rotate(-13deg)"
-                        : "rotate(-28deg)",
+                        ? "rotate(-12.7762deg)"
+                        : "rotate(-27.7762deg)",
                     opacity:
                       stackPos === 0 && isExiting
                         ? 0.2
@@ -319,7 +319,7 @@ export default function HomePage() {
                         ? 1
                         : stackPos === 1
                         ? 0.75
-                        : 0.55,
+                        : 0.6,
                     transition:
                       stackPos === 0 && isExiting
                         ? "transform 0.18s ease-in, opacity 0.18s ease-in"
@@ -371,39 +371,9 @@ export default function HomePage() {
                             flexShrink: 0,
                           }}
                         >
-                          <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M3.5 8.5A6 6 0 0 1 14.5 5"
-                              stroke="#8A8178"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                            />
-                            <path
-                              d="M16.5 11.5A6 6 0 0 1 5.5 15"
-                              stroke="#8A8178"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                            />
-                            <path
-                              d="M13 3.5 15.5 5 14 7.5"
-                              stroke="#8A8178"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M7 16.5 4.5 15 6 12.5"
-                              stroke="#8A8178"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
+                          <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.01514 9.79652V11.6055C3.01502 12.0806 3.1085 12.551 3.29023 12.99C3.47196 13.4289 3.73837 13.8278 4.07427 14.1638C4.41016 14.4997 4.80895 14.7662 5.24785 14.9481C5.68676 15.1299 6.15718 15.2235 6.63226 15.2235H17.4836M3.01514 5.2749H13.8665C14.3417 5.27479 14.8122 5.3683 15.2512 5.55008C15.6902 5.73186 16.0891 5.99835 16.4251 6.33433C16.761 6.67032 17.0275 7.0692 17.2093 7.50821C17.3911 7.94721 17.4846 8.41773 17.4845 8.89288V10.701" stroke="#526037" strokeWidth="1.28115" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M14.7709 12.51L17.4844 15.2226L14.7709 17.9361M5.72764 7.98837L3.01416 5.27489L5.72764 2.56226" stroke="#526037" strokeWidth="1.28115" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                         </button>
                       </div>
@@ -421,7 +391,8 @@ export default function HomePage() {
                       {/* CTA */}
                       <Link
                         href={`/session/${cardRec.session.id}`}
-                        className="block rounded-xl bg-fitto-accent py-3.5 text-center text-sm font-semibold text-white transition-colors hover:bg-fitto-accent-hover"
+                        className="block rounded-xl py-3.5 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                        style={{ backgroundColor: getTagStyle(cardRec.session.tag).color }}
                       >
                         Begin when you&apos;re ready
                       </Link>
