@@ -464,8 +464,8 @@ export default function HomePage() {
           </div>
 
           {/* Right column, row 2: compact weekly strip */}
-          <div className="mt-1.5 rounded-lg bg-fitto-bg px-2 py-1.5">
-            <div className="flex items-center justify-between">
+          <div className="mt-1.5 flex items-center rounded-lg bg-fitto-bg px-2 py-1.5">
+            <div className="flex w-full items-center justify-between">
               {rhythm.map((day) => {
                 const hasDone = day.done > 0;
                 const hasSkip = day.skip > 0 && !hasDone;
