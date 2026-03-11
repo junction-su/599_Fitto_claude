@@ -8,133 +8,124 @@ export interface Recommendation {
   rule: string;
 }
 
-interface RecommendationInput {
+export interface RecommendationInput {
   energy: EnergyLevel;
   skipsLast7Days: number;
   completionsLast7Days: number;
   lastRecommendationId?: string;
 }
 
-function pickRandom<T>(items: T[], excludeIndex?: number): T {
-  const filtered =
-    excludeIndex !== undefined
-      ? items.filter((_, i) => i !== excludeIndex)
-      : items;
-  return filtered[Math.floor(Math.random() * filtered.length)] || items[0];
-}
-
-function findByTone(
-  tone: Session["tone"],
-  excludeId?: string
-): Session {
-  const matches = catalog.filter(
-    (s) => s.tone === tone && s.id !== excludeId
-  );
-  return matches.length > 0 ? pickRandom(matches) : catalog[0];
-}
+// ─── Single recommendation (kept for compatibility) ──────────────────────────
 
 export function getRecommendation(input: RecommendationInput): Recommendation {
-  const { energy, skipsLast7Days, completionsLast7Days, lastRecommendationId } =
-    input;
-
-  // Rule 1: Low energy OR high skip count → ultra-low-barrier reset
-  if (energy === "low" || skipsLast7Days >= 2) {
-    return {
-      session: findByTone("reset", lastRecommendationId),
-      rationale: "Lowering the barrier to help you restart gently.",
-      rule:
-        energy === "low"
-          ? `Energy is low → suggesting a short reset session.`
-          : `${skipsLast7Days} skips this week → lowering the ask to help you show up.`,
-    };
-  }
-
-  // Rule 2: High energy AND good consistency → longer flow session
-  if (energy === "high" && completionsLast7Days >= 2) {
-    return {
-      session: findByTone("energizing", lastRecommendationId),
-      rationale:
-        "You've been consistent — let's build momentum without intensity spikes.",
-      rule: `High energy + ${completionsLast7Days} completions this week → a longer flow session.`,
-    };
-  }
-
-  // Rule 3: Medium energy, few skips → gentle middle path
-  if (energy === "medium" && skipsLast7Days < 2) {
-    return {
-      session: findByTone("gentle", lastRecommendationId),
-      rationale: "Steady support to maintain your rhythm.",
-      rule: `Medium energy, few skips → a gentle session to keep the streak alive.`,
-    };
-  }
-
-  // Default: gentle
-  return {
-    session: findByTone("gentle", lastRecommendationId),
-    rationale: "A gentle session feels right for today.",
-    rule: `Default recommendation → gentle session to keep things easy.`,
-  };
+  return getRecommendations(input)[0];
 }
+
+// ─── 3-card recommendation set ───────────────────────────────────────────────
 
 export function getRecommendations(input: RecommendationInput): Recommendation[] {
   const { energy, skipsLast7Days, completionsLast7Days, lastRecommendationId } = input;
 
-  // Determine primary tone (same rules as getRecommendation)
-  let primaryTone: Session["tone"];
-  let rationale: string;
-  let rule: string;
+  const hasSkips = skipsLast7Days >= 2;
+  const hasStreak = completionsLast7Days >= 2;
 
-  if (energy === "low" || skipsLast7Days >= 2) {
-    primaryTone = "reset";
-    rationale = "Lowering the barrier to help you restart gently.";
-    rule =
-      energy === "low"
-        ? "Energy is low → suggesting a short reset session."
-        : `${skipsLast7Days} skips this week → lowering the ask to help you show up.`;
-  } else if (energy === "high" && completionsLast7Days >= 2) {
-    primaryTone = "energizing";
-    rationale =
-      "You've been consistent — let's build momentum without intensity spikes.";
-    rule = `High energy + ${completionsLast7Days} completions this week → a longer flow session.`;
-  } else if (energy === "medium" && skipsLast7Days < 2) {
-    primaryTone = "gentle";
-    rationale = "Steady support to maintain your rhythm.";
-    rule =
-      "Medium energy, few skips → a gentle session to keep the streak alive.";
-  } else {
-    primaryTone = "gentle";
-    rationale = "A gentle session feels right for today.";
-    rule = "Default recommendation → gentle session to keep things easy.";
+  // ── Step 1: Energy level unconditionally determines the session pool ──────
+  //   Low    → reset sessions   (2–3 min: Breathing, Posture, Body Scan)
+  //   Medium → gentle sessions  (5–6 min: Stretch, Mobility, Walk)
+  //   High   → energizing sessions (8–10 min: Flow, Core, Walk, Full-Body)
+  //
+  //   This guarantees that changing energy always changes the visible cards.
+  const primaryTone: Session["tone"] =
+    energy === "low" ? "reset" : energy === "high" ? "energizing" : "gentle";
+
+  let pool = catalog.filter((s) => s.tone === primaryTone);
+
+  // ── Step 2: Behavior signals reorder within the pool ─────────────────────
+  //   Skips ≥ 2  → shortest / lowest-friction sessions first
+  //   Streak ≥ 2 → longer / more substantial sessions first
+  //   Neutral    → natural catalog order (already ASC by duration)
+  if (hasSkips) {
+    pool = [...pool].sort((a, b) => a.durationMin - b.durationMin);
+  } else if (hasStreak) {
+    pool = [...pool].sort((a, b) => b.durationMin - a.durationMin);
   }
 
-  const adjacentTone: Session["tone"] =
-    primaryTone === "energizing"
-      ? "gentle"
-      : primaryTone === "reset"
-      ? "gentle"
-      : "reset";
+  // ── Step 3: Push last recommendation to end (avoid repeating same card) ──
+  const excluded = pool.find((s) => s.id === lastRecommendationId);
+  const ordered = excluded
+    ? [...pool.filter((s) => s.id !== lastRecommendationId), excluded]
+    : pool;
 
-  const primaryPool = catalog.filter(
-    (s) => s.tone === primaryTone && s.id !== lastRecommendationId
-  );
-  const adjacentPool = catalog.filter((s) => s.tone === adjacentTone);
-  const pool = [...primaryPool, ...adjacentPool];
-
+  // ── Step 4: Pick first 3 unique sessions ─────────────────────────────────
   const picked: Session[] = [];
-  for (const s of pool) {
+  for (const s of ordered) {
     if (picked.length >= 3) break;
     if (!picked.find((p) => p.id === s.id)) picked.push(s);
   }
+
+  // ── Step 5: Attach explainable rule + rationale ───────────────────────────
+  const { rule, rationale } = buildContext(energy, skipsLast7Days, completionsLast7Days);
 
   return picked.map((session, i) => ({
     session,
     rationale:
       i === 0
         ? rationale
-        : "Another gentle way to start today — pick what feels right.",
+        : `Another ${energy === "low" ? "calming" : energy === "medium" ? "gentle" : "active"} option — ${session.durationMin} min ${session.tag.toLowerCase()} if this feels like a better fit.`,
     rule:
       i === 0
         ? rule
-        : `Alternative suggestion — a different starting point for ${energy} energy.`,
+        : `Alternative ${energy} energy option — ${session.durationMin} min ${session.tag}.`,
   }));
+}
+
+// ─── Explainability helpers ───────────────────────────────────────────────────
+
+function buildContext(
+  energy: EnergyLevel,
+  skips: number,
+  completions: number
+): { rule: string; rationale: string } {
+  const hasSkips = skips >= 2;
+  const hasStreak = completions >= 2;
+
+  if (energy === "low") {
+    return {
+      rule: hasSkips
+        ? `Low energy + ${skips} skips this week → reset sessions to keep the habit alive with zero friction.`
+        : `Low energy → short reset sessions (2–3 min) to lower the barrier to showing up.`,
+      rationale: hasSkips
+        ? "Low energy and recent skips — the shortest possible session to keep the habit alive."
+        : "Keeping it as simple as possible so showing up still counts.",
+    };
+  }
+
+  if (energy === "medium") {
+    return {
+      rule: hasSkips
+        ? `Medium energy + ${skips} skips → gentlest options first to rebuild momentum.`
+        : hasStreak
+        ? `Medium energy + ${completions} completions this week → steady movement to keep your streak going.`
+        : `Medium energy → gentle movement sessions (5–6 min) to maintain rhythm.`,
+      rationale: hasSkips
+        ? "A few recent skips — starting with something low-friction to get back on track."
+        : hasStreak
+        ? "You've been consistent — a steady gentle session to maintain that rhythm."
+        : "Steady movement to support a healthy routine.",
+    };
+  }
+
+  // High energy
+  return {
+    rule: hasSkips
+      ? `High energy but ${skips} skips → prioritizing shorter active sessions to ease back in.`
+      : hasStreak
+      ? `High energy + ${completions} completions this week → longer sessions to build on your momentum.`
+      : `High energy → active beginner-friendly sessions (8–10 min) to match your energy.`,
+    rationale: hasSkips
+      ? "High energy but some recent skips — easing back in with a shorter active session."
+      : hasStreak
+      ? "Strong consistency and high energy — time to build on that momentum."
+      : "You're feeling good — a more active session to match your energy.",
+  };
 }
