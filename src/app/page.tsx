@@ -403,29 +403,25 @@ export default function HomePage() {
                   }}
                 />
               )}
-              {/* Flame SVG — rounded blob shape matching Figma design */}
+              {/* Flame SVG — exact shape from Figma */}
               <svg
                 className={`relative h-12 w-12 ${
                   streak.count > 0 ? "animate-flame-breathe" : ""
                 }`}
-                viewBox="0 0 48 56"
+                viewBox="0 0 65 75"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                {/* Outer flame — wide rounded teardrop blob */}
                 <path
-                  d="M24 2C32 2, 46 16, 46 30C46 43, 36 54, 24 54C12 54, 2 43, 2 30C2 16, 16 2, 24 2Z"
+                  d="M25.188 0C29.9132 0 38.0404 12.2935 38.0404 12.2935C38.0404 12.2935 41.6791 5.73952 45.9681 5.78423C50.257 5.82894 64.9703 24.0967 64.9703 39.9694C64.9703 55.8422 52.6269 74.0395 31.4188 74.0395C10.2106 74.0395 1.86414e-05 56.0475 0 39.9694C-1.86413e-05 23.8914 20.4629 0 25.188 0Z"
                   fill={streak.count > 0 ? "#E87040" : "none"}
-                  stroke={streak.count > 0 ? "#E87040" : "#8A8178"}
+                  stroke={streak.count > 0 ? "none" : "#8A8178"}
                   strokeWidth={streak.count > 0 ? 0 : 1.5}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
                   opacity={streak.count > 0 ? 1 : 0.2}
                 />
-                {/* Inner white oval — drop shape in upper center */}
                 {streak.count > 0 && (
                   <path
-                    d="M24 14C29 14, 35 21, 35 28C35 34, 30 39, 24 39C18 39, 13 34, 13 28C13 21, 19 14, 24 14Z"
+                    d="M25.3306 28.829C27.9111 28.6168 34.2204 42.0648 37.8987 42.4179C40.6611 42.6831 42.7297 36.4847 45.363 36.4847C47.7232 36.4847 48.8704 41.6269 48.4892 45.6716C48.1079 49.7162 45.4569 55.2143 43.0025 57.0913C40.5481 58.9684 36.1568 60.6735 31.519 60.2812C22.8997 59.5522 16.5791 52.7707 16.1766 44.526C15.9296 39.466 21.2099 29.1678 25.3306 28.829Z"
                     fill="white"
                     opacity={0.9}
                   />
