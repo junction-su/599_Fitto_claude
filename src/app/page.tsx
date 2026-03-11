@@ -401,7 +401,7 @@ export default function HomePage() {
           </div>
 
           {/* Dot indicators */}
-          <div className="mt-5 flex justify-center gap-1.5">
+          <div className="-mt-4 flex justify-center gap-1.5">
             {recs.map((_, i) => (
               <div
                 key={i}
