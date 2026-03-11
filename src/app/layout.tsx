@@ -19,7 +19,7 @@ export default function RootLayout({
         <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
       </head>
       <body className="min-h-screen bg-fitto-bg text-fitto-text antialiased">
-        <main className="mx-auto max-w-md px-4 pb-12">{children}</main>
+        <main className="mx-auto max-w-md overflow-x-hidden px-4 pb-12">{children}</main>
       </body>
     </html>
   );

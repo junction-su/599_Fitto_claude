@@ -271,10 +271,7 @@ export default function HomePage() {
 
       {/* Suggestion Card Deck */}
       {recs.length > 0 && (
-        // overflow-x:clip clips rotated ghost card horizontal bleed without
-        // the CSS quirk that forces overflow-y:auto (unlike overflow-x:hidden),
-        // so the front card's bottom box-shadow remains fully visible.
-        <section className="mt-8" style={{ overflowX: "clip" }}>
+        <section className="mt-8">
           <h2 className="mb-1.5 text-lg font-semibold text-fitto-text">
             Today&apos;s gentle suggestion
           </h2>
@@ -308,11 +305,9 @@ export default function HomePage() {
                   }}
                   style={{
                     position: "absolute",
-                    width: "min(260px, calc(100% - 32px))",
+                    width: "min(260px, calc(80% - 8px))",
                     height: 304,
-                    left: 0,
-                    right: 0,
-                    margin: "auto",
+                    left: "20%",
                     top: 40,
                     borderRadius: 32,
                     backgroundColor: isFront ? "#F0ECE4" : "rgba(161,174,136,0.2)",
