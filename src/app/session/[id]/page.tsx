@@ -3,16 +3,13 @@
 import { useEffect, useState, useRef } from "react";
 import { getSessionById, Session } from "@/lib/engine/catalog";
 import { loadState, saveState, FittoEvent } from "@/lib/storage";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 
 type Status = "active" | "done" | "skipped";
 
-export default function SessionPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = params;
+export default function SessionPage() {
+  const params = useParams();
+  const id = params.id as string;
   const router = useRouter();
   const [session, setSession] = useState<Session | null>(null);
   const [elapsed, setElapsed] = useState(0);

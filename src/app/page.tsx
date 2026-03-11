@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import {
   EnergyLevel,
-  getRecommendation,
+  getRecommendations,
   Recommendation,
 } from "@/lib/engine/recommendation";
 import {
@@ -36,7 +36,9 @@ function formatDate(): string {
 
 export default function HomePage() {
   const [state, setState] = useState<FittoState | null>(null);
-  const [rec, setRec] = useState<Recommendation | null>(null);
+  const [recs, setRecs] = useState<Recommendation[]>([]);
+  const [recIndex, setRecIndex] = useState(0);
+  const [isSwapping, setIsSwapping] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
   const [demoOpen, setDemoOpen] = useState(false);
 
@@ -45,28 +47,26 @@ export default function HomePage() {
     setState(loadState());
   }, []);
 
-  // Recompute recommendation whenever state changes
-  const computeRec = useCallback(
-    (s: FittoState) => {
-      if (!s.energy) {
-        setRec(null);
-        return;
-      }
-      const skips = countSkipsLast7Days(s.events);
-      const completions = countCompletionsLast7Days(s.events);
-      const r = getRecommendation({
-        energy: s.energy,
-        skipsLast7Days: skips,
-        completionsLast7Days: completions,
-        lastRecommendationId: s.lastRecommendationId,
-      });
-      setRec(r);
-      // Persist last recommendation
-      const updated = { ...s, lastRecommendationId: r.session.id };
-      saveState(updated);
-    },
-    []
-  );
+  // Recompute recommendations whenever state changes
+  const computeRec = useCallback((s: FittoState) => {
+    if (!s.energy) {
+      setRecs([]);
+      setRecIndex(0);
+      return;
+    }
+    const skips = countSkipsLast7Days(s.events);
+    const completions = countCompletionsLast7Days(s.events);
+    const results = getRecommendations({
+      energy: s.energy,
+      skipsLast7Days: skips,
+      completionsLast7Days: completions,
+      lastRecommendationId: s.lastRecommendationId,
+    });
+    setRecs(results);
+    setRecIndex(0);
+    const updated = { ...s, lastRecommendationId: results[0]?.session.id };
+    saveState(updated);
+  }, []);
 
   useEffect(() => {
     if (state) computeRec(state);
@@ -76,6 +76,15 @@ export default function HomePage() {
     const updated = { ...state!, energy };
     setState(updated);
     saveState(updated);
+  };
+
+  const handleSwap = () => {
+    if (isSwapping || recs.length < 2) return;
+    setIsSwapping(true);
+    setTimeout(() => {
+      setRecIndex((prev) => (prev + 1) % recs.length);
+      setIsSwapping(false);
+    }, 400);
   };
 
   // Demo controls
@@ -134,7 +143,8 @@ export default function HomePage() {
     clearState();
     const fresh: FittoState = { energy: null, events: [] };
     setState(fresh);
-    setRec(null);
+    setRecs([]);
+    setRecIndex(0);
     setWhyOpen(false);
   };
 
@@ -246,68 +256,168 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Suggestion Card */}
-      {rec && (
+      {/* Suggestion Card Deck */}
+      {recs.length > 0 && (
         <section className="mt-8">
-          <h2 className="mb-3 text-lg font-semibold text-fitto-text">
+          <h2 className="mb-5 text-lg font-semibold text-fitto-text">
             Today&apos;s gentle suggestion
           </h2>
-          <div className="relative overflow-hidden rounded-2xl bg-fitto-card p-6">
-            {/* Animated blobs */}
-            <span
-              className="pointer-events-none absolute -left-8 -top-8 h-32 w-32 animate-blob-1 rounded-full opacity-40"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(111,125,90,0.25) 0%, transparent 70%)",
-                filter: "blur(30px)",
-              }}
-            />
-            <span
-              className="pointer-events-none absolute -bottom-6 right-4 h-28 w-28 animate-blob-2 rounded-full opacity-35"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(138,129,120,0.2) 0%, transparent 70%)",
-                filter: "blur(25px)",
-              }}
-            />
-            <span
-              className="pointer-events-none absolute right-1/3 top-1/2 h-24 w-24 animate-blob-3 rounded-full opacity-30"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(111,125,90,0.15) 0%, transparent 70%)",
-                filter: "blur(20px)",
-              }}
-            />
 
-            {/* Content */}
-            <div className="relative z-10">
-              <div className="flex items-center gap-2">
-                <span className="rounded-full bg-fitto-accent/10 px-2.5 py-0.5 text-xs font-medium text-fitto-accent">
-                  {rec.session.tag}
-                </span>
-                <span className="text-xs text-fitto-muted">
-                  {rec.session.durationMin} min
-                </span>
-                <span className="rounded-full bg-fitto-accent/10 px-2.5 py-0.5 text-xs font-medium text-fitto-accent">
-                  Beginner-friendly
-                </span>
-              </div>
-              <h3 className="mt-3 text-xl font-bold text-fitto-text">
-                {rec.session.title}
-              </h3>
-              <p className="mt-1.5 text-sm text-fitto-muted">
-                {rec.session.description}
-              </p>
-              <Link
-                href={`/session/${rec.session.id}`}
-                className="mt-5 block rounded-xl bg-fitto-accent py-3.5 text-center text-sm font-semibold text-white transition-colors hover:bg-fitto-accent-hover"
-              >
-                Begin when you&apos;re ready
-              </Link>
-              <p className="mt-2.5 text-center text-xs text-fitto-muted">
-                Chosen based on your current energy and recent rhythm
-              </p>
-            </div>
+          {/* Stacked card deck — matches Figma: all cards at same anchor, rotated */}
+          <div className="relative" style={{ height: 400 }}>
+            {recs.map((cardRec, cardIdx) => {
+              const stackPos =
+                (cardIdx - recIndex + recs.length) % recs.length;
+              const isFront = stackPos === 0;
+
+              return (
+                <div
+                  key={cardIdx}
+                  style={{
+                    position: "absolute",
+                    width: 260,
+                    height: 304,
+                    left: "20%",
+                    top: 72,
+                    borderRadius: 32,
+                    backgroundColor: isFront
+                      ? "#F0ECE4"
+                      : "rgba(161,174,136,0.22)",
+                    boxShadow: isFront
+                      ? "0 0 56px rgba(166,161,149,0.3)"
+                      : "none",
+                    zIndex: stackPos === 0 ? 30 : stackPos === 1 ? 20 : 10,
+                    transform:
+                      stackPos === 0
+                        ? "rotate(0deg)"
+                        : stackPos === 1
+                        ? "rotate(-13deg)"
+                        : "rotate(-28deg)",
+                    opacity:
+                      stackPos === 0 ? 1 : stackPos === 1 ? 0.75 : 0.55,
+                    transition:
+                      "transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease",
+                    pointerEvents: isFront ? "auto" : "none",
+                  }}
+                >
+                  {isFront && (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        height: "100%",
+                        padding: 16,
+                      }}
+                    >
+                      {/* Tags row + swap button */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="rounded-full bg-fitto-accent/10 px-2.5 py-0.5 text-xs font-medium text-fitto-accent">
+                            {cardRec.session.tag}
+                          </span>
+                          <span className="text-xs text-fitto-muted">
+                            {cardRec.session.durationMin} min
+                          </span>
+                        </div>
+                        {/* Swap button — circle with exchange icon */}
+                        <button
+                          onClick={handleSwap}
+                          disabled={isSwapping}
+                          aria-label="Try another suggestion"
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: "50%",
+                            backgroundColor: "#F7F4ED",
+                            border: "none",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                            opacity: isSwapping ? 0.4 : 1,
+                            transition: "opacity 0.2s",
+                            flexShrink: 0,
+                          }}
+                        >
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M3.5 8.5A6 6 0 0 1 14.5 5"
+                              stroke="#8A8178"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                            />
+                            <path
+                              d="M16.5 11.5A6 6 0 0 1 5.5 15"
+                              stroke="#8A8178"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                            />
+                            <path
+                              d="M13 3.5 15.5 5 14 7.5"
+                              stroke="#8A8178"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M7 16.5 4.5 15 6 12.5"
+                              stroke="#8A8178"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+
+                      {/* Title + description */}
+                      <div>
+                        <h3 className="text-xl font-bold text-fitto-text">
+                          {cardRec.session.title}
+                        </h3>
+                        <p className="mt-2 text-sm leading-relaxed text-fitto-muted">
+                          {cardRec.session.description}
+                        </p>
+                      </div>
+
+                      {/* CTA */}
+                      <Link
+                        href={`/session/${cardRec.session.id}`}
+                        className="block rounded-xl bg-fitto-accent py-3.5 text-center text-sm font-semibold text-white transition-colors hover:bg-fitto-accent-hover"
+                      >
+                        Begin when you&apos;re ready
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Dot indicators */}
+          <div className="mt-5 flex justify-center gap-1.5">
+            {recs.map((_, i) => (
+              <div
+                key={i}
+                className="rounded-full transition-all duration-300"
+                style={{
+                  width: i === recIndex ? 16 : 6,
+                  height: 6,
+                  backgroundColor:
+                    i === recIndex
+                      ? "#6F7D5A"
+                      : "rgba(138,129,120,0.25)",
+                }}
+              />
+            ))}
           </div>
 
           {/* Why this today? */}
@@ -348,13 +458,13 @@ export default function HomePage() {
                 <hr className="border-fitto-muted/15" />
                 <p className="text-fitto-muted">
                   <span className="font-medium text-fitto-text">Rule: </span>
-                  {rec.rule}
+                  {recs[recIndex]?.rule}
                 </p>
                 <p className="text-fitto-muted">
                   <span className="font-medium text-fitto-text">
                     Rationale:{" "}
                   </span>
-                  {rec.rationale}
+                  {recs[recIndex]?.rationale}
                 </p>
               </div>
             </div>
@@ -363,7 +473,7 @@ export default function HomePage() {
       )}
 
       {/* No energy selected prompt */}
-      {!rec && !state.energy && (
+      {recs.length === 0 && !state.energy && (
         <section className="mt-8">
           <div className="rounded-2xl border-2 border-dashed border-fitto-muted/20 p-8 text-center">
             <p className="text-sm text-fitto-muted">
