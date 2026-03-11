@@ -277,25 +277,28 @@ export default function HomePage() {
           </h2>
 
           {/* Stacked card deck — Framer Motion, Apple Wallet style */}
-          <div className="relative" style={{ height: 400, overflow: "hidden" }}>
+          <div className="relative" style={{ height: 360, overflow: "hidden" }}>
             {recs.map((cardRec, cardIdx) => {
               const stackPos = (cardIdx - recIndex + recs.length) % recs.length;
               const isFront = stackPos === 0;
 
               // Per-position target values
+              // y offset inspired by stacked-card repo: back cards shift slightly
+              // downward, reinforcing the physical depth alongside rotation
               const scale   = stackPos === 0 ? 1    : stackPos === 1 ? 0.96 : 0.92;
               const rotate  = stackPos === 0 ? 0    : stackPos === 1 ? -12.7762 : -27.7762;
               const opacity = stackPos === 0 ? 1    : stackPos === 1 ? 0.75 : 0.6;
+              const y       = stackPos === 0 ? 0    : stackPos === 1 ? 8    : 16;
 
               return (
                 <motion.div
                   key={cardIdx}
-                  initial={{ scale, rotate, opacity }}
-                  animate={{ scale, rotate, opacity }}
+                  initial={{ scale, rotate, opacity, y }}
+                  animate={{ scale, rotate, opacity, y }}
                   transition={{
                     type: "tween",
                     ease: [0.22, 1, 0.36, 1],
-                    duration: 0.3,
+                    duration: 0.33,
                   }}
                   style={{
                     position: "absolute",
@@ -304,7 +307,7 @@ export default function HomePage() {
                     left: 0,
                     right: 0,
                     margin: "auto",
-                    top: 72,
+                    top: 40,
                     borderRadius: 32,
                     backgroundColor: isFront ? "#F0ECE4" : "rgba(161,174,136,0.2)",
                     boxShadow: isFront ? "0 0 56px rgba(166,161,149,0.3)" : "none",
