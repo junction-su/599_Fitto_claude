@@ -385,7 +385,7 @@ export default function HomePage() {
           {/* Left column: streak card spanning both rows */}
           <div
             className="row-span-2 mr-3 flex flex-col items-center justify-center rounded-xl"
-            style={{ backgroundColor: "#EDE3D6" }}
+            style={{ backgroundColor: "#EDE3D6", marginTop: 1 }}
           >
             {/* Flame + glow */}
             <div className="relative flex items-center justify-center">
@@ -394,7 +394,7 @@ export default function HomePage() {
                   className="pointer-events-none absolute h-16 w-16 animate-flame-glow rounded-full"
                   style={{
                     background:
-                      "radial-gradient(circle, rgba(232,112,64,0.3) 0%, rgba(232,112,64,0.08) 50%, transparent 70%)",
+                      "radial-gradient(circle, rgba(111,125,90,0.35) 0%, rgba(111,125,90,0.1) 50%, transparent 70%)",
                     filter: "blur(10px)",
                   }}
                 />
@@ -410,7 +410,7 @@ export default function HomePage() {
               >
                 <path
                   d="M25.188 0C29.9132 0 38.0404 12.2935 38.0404 12.2935C38.0404 12.2935 41.6791 5.73952 45.9681 5.78423C50.257 5.82894 64.9703 24.0967 64.9703 39.9694C64.9703 55.8422 52.6269 74.0395 31.4188 74.0395C10.2106 74.0395 1.86414e-05 56.0475 0 39.9694C-1.86413e-05 23.8914 20.4629 0 25.188 0Z"
-                  fill={streak.count > 0 ? "#E87040" : "none"}
+                  fill={streak.count > 0 ? "#6F7D5A" : "none"}
                   stroke={streak.count > 0 ? "none" : "#8A8178"}
                   strokeWidth={streak.count > 0 ? 0 : 1.5}
                   opacity={streak.count > 0 ? 1 : 0.2}
@@ -481,9 +481,9 @@ export default function HomePage() {
                         width: hasDone ? 26 : 22,
                         height: hasDone ? 26 : 22,
                         backgroundColor: hasDone
-                          ? "#E87040"
+                          ? "#6F7D5A"
                           : "#D9CEBC",
-                        boxShadow: hasDone ? "0 1px 4px rgba(232,112,64,0.3)" : "none",
+                        boxShadow: hasDone ? "0 1px 4px rgba(111,125,90,0.3)" : "none",
                       }}
                       title={`${day.date}: ${day.done} done, ${day.skip} skipped`}
                     >
