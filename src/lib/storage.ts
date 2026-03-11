@@ -78,3 +78,45 @@ export function getRhythmLast7Days(
   }
   return days;
 }
+
+export interface StreakInfo {
+  count: number;
+  lastEventWasSkip: boolean;
+  hadStreakBeforeSkip: boolean;
+}
+
+/** Compute current completion streak (consecutive days with ≥1 done, ending today or yesterday). */
+export function getStreakInfo(events: FittoEvent[]): StreakInfo {
+  const lastEvent = [...events].sort(
+    (a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()
+  )[0];
+  const lastEventWasSkip = lastEvent?.type === "skip";
+
+  // Build a set of date strings that have at least one completion
+  const completionDates = new Set<string>();
+  for (const e of events) {
+    if (e.type === "done") {
+      completionDates.add(e.at.slice(0, 10));
+    }
+  }
+
+  // Count consecutive days backwards from today
+  let streak = 0;
+  for (let i = 0; i < 365; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().slice(0, 10);
+    if (completionDates.has(dateStr)) {
+      streak++;
+    } else {
+      // Allow skipping today if no activity yet (check from yesterday)
+      if (i === 0) continue;
+      break;
+    }
+  }
+
+  // Determine if user had a streak before their most recent skip
+  const hadStreakBeforeSkip = lastEventWasSkip && streak > 0;
+
+  return { count: streak, lastEventWasSkip, hadStreakBeforeSkip };
+}
