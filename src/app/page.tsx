@@ -175,6 +175,7 @@ export default function HomePage() {
   const completions = countCompletionsLast7Days(state.events);
   const rhythm = getCurrentWeekRhythm(state.events);
   const streak = getStreakInfo(state.events);
+  const todayStr = new Date().toISOString().slice(0, 10);
 
   // State-based streak copy (number lives in left card only — right side is emotional)
   const streakCopy = (() => {
@@ -580,8 +581,37 @@ export default function HomePage() {
               {rhythm.map((day) => {
                 const hasDone = day.done > 0;
                 const hasSkip = day.skip > 0 && !hasDone;
+                const isToday = day.date === todayStr;
+                const isFuture = day.date > todayStr;
                 const dayDate = new Date(day.date + "T12:00:00");
                 const dayLabel = DAY_LABELS[dayDate.getDay()];
+
+                // 4 distinct visual states
+                let dotStyle: React.CSSProperties;
+                if (hasDone) {
+                  // State 1: DONE — accent green, most prominent
+                  dotStyle = {
+                    backgroundColor: "#6F7D5A",
+                    boxShadow: "0 1px 4px rgba(111,125,90,0.28)",
+                  };
+                } else if (hasSkip) {
+                  // State 2: SKIPPED — muted warm tan, feels like a pause not a failure
+                  dotStyle = {
+                    backgroundColor: "#C8BDB5",
+                  };
+                } else if (isToday) {
+                  // State 3: TODAY / no action yet — open ring, still available
+                  dotStyle = {
+                    backgroundColor: "transparent",
+                    border: "1.5px solid #B5ACA4",
+                  };
+                } else {
+                  // State 4: FUTURE or past-inactive — flat, low emphasis
+                  dotStyle = {
+                    backgroundColor: isFuture ? "#EAE5DE" : "#DDD8D1",
+                  };
+                }
+
                 return (
                   <div
                     key={day.date}
@@ -589,14 +619,7 @@ export default function HomePage() {
                   >
                     <div
                       className="flex items-center justify-center rounded-full transition-all"
-                      style={{
-                        width: 22,
-                        height: 22,
-                        backgroundColor: hasDone
-                          ? "#6F7D5A"
-                          : "#D9CEBC",
-                        boxShadow: hasDone ? "0 1px 4px rgba(111,125,90,0.3)" : "none",
-                      }}
+                      style={{ width: 22, height: 22, ...dotStyle }}
                       title={`${day.date}: ${day.done} done, ${day.skip} skipped`}
                     >
                       {hasDone && (
@@ -614,8 +637,29 @@ export default function HomePage() {
                           />
                         </svg>
                       )}
+                      {hasSkip && (
+                        // Soft dash — communicates pause, not failure
+                        <svg width="8" height="2" viewBox="0 0 8 2" fill="none">
+                          <path
+                            d="M1 1H7"
+                            stroke="#8A8178"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            opacity={0.7}
+                          />
+                        </svg>
+                      )}
                     </div>
-                    <span className="text-[8px] font-medium text-fitto-muted/60">
+                    <span
+                      className="text-[8px] font-medium"
+                      style={{
+                        color: isToday
+                          ? "rgba(138,129,120,0.85)"
+                          : isFuture
+                          ? "rgba(138,129,120,0.3)"
+                          : "rgba(138,129,120,0.55)",
+                      }}
+                    >
                       {dayLabel}
                     </span>
                   </div>
