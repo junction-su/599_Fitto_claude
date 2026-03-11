@@ -26,6 +26,19 @@ const ENERGY_OPTIONS: { value: EnergyLevel; label: string }[] = [
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+// Soft muted tag colors per session category
+function getTagStyle(tag: string): { background: string; color: string } {
+  switch (tag) {
+    case "Breathing": return { background: "rgba(99,149,210,0.14)", color: "#4A7BB5" };
+    case "Walk":      return { background: "rgba(111,125,90,0.14)", color: "#6F7D5A" };
+    case "Stretch":   return { background: "rgba(198,130,70,0.14)", color: "#A06828" };
+    case "Mobility":  return { background: "rgba(198,120,80,0.13)", color: "#A06030" };
+    case "Posture":   return { background: "rgba(140,110,175,0.13)", color: "#7B5E9A" };
+    case "Core":      return { background: "rgba(185,90,90,0.13)",  color: "#9B4545" };
+    default:          return { background: "rgba(111,125,90,0.12)", color: "#6F7D5A" };
+  }
+}
+
 function formatDate(): string {
   return new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -38,7 +51,7 @@ export default function HomePage() {
   const [state, setState] = useState<FittoState | null>(null);
   const [recs, setRecs] = useState<Recommendation[]>([]);
   const [recIndex, setRecIndex] = useState(0);
-  const [isSwapping, setIsSwapping] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
   const [demoOpen, setDemoOpen] = useState(false);
 
@@ -79,12 +92,14 @@ export default function HomePage() {
   };
 
   const handleSwap = () => {
-    if (isSwapping || recs.length < 2) return;
-    setIsSwapping(true);
+    if (isExiting || recs.length < 2) return;
+    // Phase 1: exit current card (180ms)
+    setIsExiting(true);
     setTimeout(() => {
+      // Phase 2: bring next card forward
       setRecIndex((prev) => (prev + 1) % recs.length);
-      setIsSwapping(false);
-    }, 400);
+      setIsExiting(false);
+    }, 200);
   };
 
   // Demo controls
@@ -287,17 +302,29 @@ export default function HomePage() {
                       ? "0 0 56px rgba(166,161,149,0.3)"
                       : "none",
                     zIndex: stackPos === 0 ? 30 : stackPos === 1 ? 20 : 10,
+                    // Phase 1: front card exits (rotate back, shrink, fade)
+                    // Phase 2: new front rises from ghost position naturally
                     transform:
-                      stackPos === 0
-                        ? "rotate(0deg)"
+                      stackPos === 0 && isExiting
+                        ? "rotate(-7deg) scale(0.88) translateY(-12px)"
+                        : stackPos === 0
+                        ? "rotate(0deg) scale(1)"
                         : stackPos === 1
                         ? "rotate(-13deg)"
                         : "rotate(-28deg)",
                     opacity:
-                      stackPos === 0 ? 1 : stackPos === 1 ? 0.75 : 0.55,
+                      stackPos === 0 && isExiting
+                        ? 0.2
+                        : stackPos === 0
+                        ? 1
+                        : stackPos === 1
+                        ? 0.75
+                        : 0.55,
                     transition:
-                      "transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease",
-                    pointerEvents: isFront ? "auto" : "none",
+                      stackPos === 0 && isExiting
+                        ? "transform 0.18s ease-in, opacity 0.18s ease-in"
+                        : "transform 0.38s cubic-bezier(0.2,0,0,1), opacity 0.38s ease-out",
+                    pointerEvents: isFront && !isExiting ? "auto" : "none",
                   }}
                 >
                   {isFront && (
@@ -313,7 +340,10 @@ export default function HomePage() {
                       {/* Tags row + swap button */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="rounded-full bg-fitto-accent/10 px-2.5 py-0.5 text-xs font-medium text-fitto-accent">
+                          <span
+                            className="rounded-full px-2.5 py-0.5 text-xs font-medium"
+                            style={getTagStyle(cardRec.session.tag)}
+                          >
                             {cardRec.session.tag}
                           </span>
                           <span className="text-xs text-fitto-muted">
@@ -323,7 +353,7 @@ export default function HomePage() {
                         {/* Swap button — circle with exchange icon */}
                         <button
                           onClick={handleSwap}
-                          disabled={isSwapping}
+                          disabled={isExiting}
                           aria-label="Try another suggestion"
                           style={{
                             width: 40,
@@ -336,7 +366,7 @@ export default function HomePage() {
                             justifyContent: "center",
                             cursor: "pointer",
                             boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-                            opacity: isSwapping ? 0.4 : 1,
+                            opacity: isExiting ? 0.4 : 1,
                             transition: "opacity 0.2s",
                             flexShrink: 0,
                           }}
