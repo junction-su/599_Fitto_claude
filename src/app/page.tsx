@@ -17,7 +17,6 @@ import {
   FittoState,
 } from "@/lib/storage";
 import Link from "next/link";
-// Flame icon is now a custom SVG inline (with inner white flame shape)
 
 const ENERGY_OPTIONS: { value: EnergyLevel; label: string }[] = [
   { value: "low", label: "Low" },
