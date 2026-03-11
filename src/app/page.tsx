@@ -388,7 +388,7 @@ export default function HomePage() {
           <div
             className={`row-span-2 mr-3 flex flex-col items-center justify-center rounded-xl transition-colors ${
               streak.count > 0
-                ? "bg-fitto-accent/10"
+                ? "bg-[#E87040]/10"
                 : "bg-fitto-bg/70"
             }`}
           >
@@ -396,48 +396,46 @@ export default function HomePage() {
             <div className="relative flex items-center justify-center">
               {streak.count > 0 && (
                 <span
-                  className="pointer-events-none absolute h-14 w-14 animate-flame-glow rounded-full"
+                  className="pointer-events-none absolute h-16 w-16 animate-flame-glow rounded-full"
                   style={{
                     background:
-                      "radial-gradient(circle, rgba(111,125,90,0.5) 0%, transparent 70%)",
-                    filter: "blur(8px)",
+                      "radial-gradient(circle, rgba(232,112,64,0.45) 0%, rgba(232,112,64,0.15) 40%, transparent 70%)",
+                    filter: "blur(10px)",
                   }}
                 />
               )}
-              {/* Custom flame SVG with inner white shape */}
+              {/* Reward flame SVG — rich solid shape with inner white cutout */}
               <svg
-                className={`relative h-10 w-10 ${
-                  streak.count > 0
-                    ? "animate-flame-breathe"
-                    : ""
+                className={`relative h-12 w-12 ${
+                  streak.count > 0 ? "animate-flame-breathe" : ""
                 }`}
-                viewBox="0 0 24 24"
+                viewBox="0 0 32 32"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                {/* Outer flame */}
+                {/* Outer flame — warm orange, organic teardrop */}
                 <path
-                  d="M12 2C12 2 6 8.5 6 13.5C6 17.09 8.69 20 12 20C15.31 20 18 17.09 18 13.5C18 8.5 12 2 12 2Z"
-                  fill={streak.count > 0 ? "#6F7D5A" : "none"}
-                  stroke={streak.count > 0 ? "#6F7D5A" : "#8A8178"}
-                  strokeWidth={1.5}
+                  d="M16 3C16 3 7 11.5 7 18.5C7 23.19 10.58 27 16 27C21.42 27 25 23.19 25 18.5C25 11.5 16 3 16 3Z"
+                  fill={streak.count > 0 ? "#E87040" : "none"}
+                  stroke={streak.count > 0 ? "#E87040" : "#8A8178"}
+                  strokeWidth={streak.count > 0 ? 0 : 1.5}
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  opacity={streak.count > 0 ? 1 : 0.25}
+                  opacity={streak.count > 0 ? 1 : 0.2}
                 />
-                {/* Inner white flame */}
+                {/* Inner white flame — rounded organic shape */}
                 {streak.count > 0 && (
                   <path
-                    d="M12 10C12 10 9.5 13 9.5 15C9.5 16.38 10.62 17.5 12 17.5C13.38 17.5 14.5 16.38 14.5 15C14.5 13 12 10 12 10Z"
+                    d="M16 14C16 14 12 18 12 20.8C12 22.56 13.79 24 16 24C18.21 24 20 22.56 20 20.8C20 18 16 14 16 14Z"
                     fill="white"
-                    opacity={0.85}
+                    opacity={0.9}
                   />
                 )}
               </svg>
             </div>
             {/* Streak count + label */}
             <span
-              className={`relative mt-2 text-lg font-bold leading-none ${
+              className={`relative mt-2.5 text-xl font-bold leading-none ${
                 streak.count > 0 ? "text-fitto-text" : "text-fitto-muted/35"
               }`}
             >
@@ -487,18 +485,18 @@ export default function HomePage() {
                     className="flex flex-col items-center gap-0.5"
                   >
                     <div
-                      className={`flex h-[22px] w-[22px] items-center justify-center rounded-full transition-colors ${
+                      className={`flex items-center justify-center rounded-full transition-all ${
                         hasDone
-                          ? "bg-fitto-accent"
+                          ? "h-[26px] w-[26px] bg-[#E87040] shadow-sm shadow-[#E87040]/25"
                           : hasSkip
-                          ? "bg-fitto-muted/12"
-                          : "bg-fitto-card/80"
+                          ? "h-[22px] w-[22px] bg-fitto-muted/12"
+                          : "h-[22px] w-[22px] bg-fitto-card/80"
                       }`}
                       title={`${day.date}: ${day.done} done, ${day.skip} skipped`}
                     >
                       {hasDone && (
                         <svg
-                          className="h-2.5 w-2.5 text-white"
+                          className="h-3 w-3 text-white"
                           fill="none"
                           viewBox="0 0 24 24"
                           strokeWidth={3.5}
