@@ -271,13 +271,13 @@ export default function HomePage() {
 
       {/* Suggestion Card Deck */}
       {recs.length > 0 && (
-        <section className="mt-8">
+        <section className="mt-8 overflow-x-hidden">
           <h2 className="mb-1.5 text-lg font-semibold text-fitto-text">
             Today&apos;s gentle suggestion
           </h2>
 
           {/* Stacked card deck — Framer Motion, Apple Wallet style */}
-          <div className="relative" style={{ height: 400 }}>
+          <div className="relative" style={{ height: 400, overflow: "hidden" }}>
             {recs.map((cardRec, cardIdx) => {
               const stackPos = (cardIdx - recIndex + recs.length) % recs.length;
               const isFront = stackPos === 0;
@@ -299,9 +299,11 @@ export default function HomePage() {
                   }}
                   style={{
                     position: "absolute",
-                    width: 260,
+                    width: "min(260px, calc(100% - 32px))",
                     height: 304,
-                    left: "20%",
+                    left: 0,
+                    right: 0,
+                    margin: "auto",
                     top: 72,
                     borderRadius: 32,
                     backgroundColor: isFront ? "#F0ECE4" : "rgba(161,174,136,0.2)",
