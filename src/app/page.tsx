@@ -271,32 +271,36 @@ export default function HomePage() {
 
       {/* Suggestion Card Deck */}
       {recs.length > 0 && (
-        <section className="mt-8">
+        // overflow-x:clip clips rotated ghost card horizontal bleed without
+        // the CSS quirk that forces overflow-y:auto (unlike overflow-x:hidden),
+        // so the front card's bottom box-shadow remains fully visible.
+        <section className="mt-8" style={{ overflowX: "clip" }}>
           <h2 className="mb-1.5 text-lg font-semibold text-fitto-text">
             Today&apos;s gentle suggestion
           </h2>
 
-          {/* Stacked card deck — Framer Motion, vertical depth stacking */}
-          {/* No overflow:hidden here — would clip the card's box-shadow */}
+          {/* Stacked card deck — rotation matches Figma node 540:285 */}
+          {/* No overflow on inner container — preserves box-shadow */}
           <div className="relative" style={{ height: 400 }}>
             {recs.map((cardRec, cardIdx) => {
               const stackPos = (cardIdx - recIndex + recs.length) % recs.length;
               const isFront = stackPos === 0;
 
-              // Per-position target values — pure y+scale+opacity, no rotation.
-              // Rotation was removed: it caused horizontal overflow AND fought
-              // against the y-offset, making the animation barely perceptible.
-              // Pure vertical stacking means: front card rises into view,
-              // back cards sink behind it — clearly readable at every step.
+              // Figma-specified rotation stacking (node 540:285):
+              //   front:  rotate 0,         scale 1,    opacity 1
+              //   second: rotate -12.7762°, scale 0.96, opacity 0.75
+              //   back:   rotate -27.7762°, scale 0.92, opacity 0.6
+              // Rotation from center anchor creates the upper-left ghost peek
+              // matching the Figma design exactly.
               const scale   = stackPos === 0 ? 1    : stackPos === 1 ? 0.96 : 0.92;
-              const y       = stackPos === 0 ? 0    : stackPos === 1 ? 10   : 20;
-              const opacity = stackPos === 0 ? 1    : stackPos === 1 ? 0.8  : 0.6;
+              const rotate  = stackPos === 0 ? 0    : stackPos === 1 ? -12.7762 : -27.7762;
+              const opacity = stackPos === 0 ? 1    : stackPos === 1 ? 0.75 : 0.6;
 
               return (
                 <motion.div
                   key={cardIdx}
-                  initial={{ scale, y, opacity }}
-                  animate={{ scale, y, opacity }}
+                  initial={{ scale, rotate, opacity }}
+                  animate={{ scale, rotate, opacity }}
                   transition={{
                     type: "tween",
                     ease: [0.22, 1, 0.36, 1],
