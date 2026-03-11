@@ -274,7 +274,7 @@ export default function HomePage() {
       {/* Suggestion Card Deck */}
       {recs.length > 0 && (
         <section className="mt-8">
-          <h2 className="mb-2.5 text-lg font-semibold text-fitto-text">
+          <h2 className="mb-1.5 text-lg font-semibold text-fitto-text">
             Today&apos;s gentle suggestion
           </h2>
 
@@ -365,7 +365,7 @@ export default function HomePage() {
                             alignItems: "center",
                             justifyContent: "center",
                             cursor: "pointer",
-                            boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                            boxShadow: "none",
                             opacity: isExiting ? 0.4 : 1,
                             transition: "opacity 0.2s",
                             flexShrink: 0,
