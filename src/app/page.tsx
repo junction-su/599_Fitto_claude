@@ -384,7 +384,7 @@ export default function HomePage() {
         >
           {/* Left column: streak card spanning both rows */}
           <div
-            className="row-span-2 mr-3 flex flex-col items-center justify-center rounded-xl bg-fitto-bg"
+            className="row-span-2 mr-3 flex flex-col items-center justify-center rounded-xl bg-fitto-bg py-4"
             style={{ marginTop: 2, marginBottom: 2 }}
           >
             {/* Flame + glow */}
