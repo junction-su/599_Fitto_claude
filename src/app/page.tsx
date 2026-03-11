@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   EnergyLevel,
   getRecommendations,
@@ -51,7 +52,7 @@ export default function HomePage() {
   const [state, setState] = useState<FittoState | null>(null);
   const [recs, setRecs] = useState<Recommendation[]>([]);
   const [recIndex, setRecIndex] = useState(0);
-  const [isExiting, setIsExiting] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
   const [demoOpen, setDemoOpen] = useState(false);
 
@@ -92,14 +93,10 @@ export default function HomePage() {
   };
 
   const handleSwap = () => {
-    if (isExiting || recs.length < 2) return;
-    // Phase 1: exit current card (180ms)
-    setIsExiting(true);
-    setTimeout(() => {
-      // Phase 2: bring next card forward
-      setRecIndex((prev) => (prev + 1) % recs.length);
-      setIsExiting(false);
-    }, 200);
+    if (isAnimating || recs.length < 2) return;
+    setIsAnimating(true);
+    setRecIndex((prev) => (prev + 1) % recs.length);
+    setTimeout(() => setIsAnimating(false), 320);
   };
 
   // Demo controls
@@ -279,16 +276,27 @@ export default function HomePage() {
             Today&apos;s gentle suggestion
           </h2>
 
-          {/* Stacked card deck — matches Figma: all cards at same anchor, rotated */}
+          {/* Stacked card deck — Framer Motion, Apple Wallet style */}
           <div className="relative" style={{ height: 400 }}>
             {recs.map((cardRec, cardIdx) => {
-              const stackPos =
-                (cardIdx - recIndex + recs.length) % recs.length;
+              const stackPos = (cardIdx - recIndex + recs.length) % recs.length;
               const isFront = stackPos === 0;
 
+              // Per-position target values
+              const scale   = stackPos === 0 ? 1    : stackPos === 1 ? 0.96 : 0.92;
+              const rotate  = stackPos === 0 ? 0    : stackPos === 1 ? -12.7762 : -27.7762;
+              const opacity = stackPos === 0 ? 1    : stackPos === 1 ? 0.75 : 0.6;
+
               return (
-                <div
+                <motion.div
                   key={cardIdx}
+                  initial={{ scale, rotate, opacity }}
+                  animate={{ scale, rotate, opacity }}
+                  transition={{
+                    type: "tween",
+                    ease: [0.22, 1, 0.36, 1],
+                    duration: 0.3,
+                  }}
                   style={{
                     position: "absolute",
                     width: 260,
@@ -296,110 +304,92 @@ export default function HomePage() {
                     left: "20%",
                     top: 72,
                     borderRadius: 32,
-                    backgroundColor: isFront
-                      ? "#F0ECE4"
-                      : "rgba(161,174,136,0.2)",
-                    boxShadow: isFront
-                      ? "0 0 56px rgba(166,161,149,0.3)"
-                      : "none",
+                    backgroundColor: isFront ? "#F0ECE4" : "rgba(161,174,136,0.2)",
+                    boxShadow: isFront ? "0 0 56px rgba(166,161,149,0.3)" : "none",
                     zIndex: stackPos === 0 ? 30 : stackPos === 1 ? 20 : 10,
-                    // Phase 1: front card exits (rotate back, shrink, fade)
-                    // Phase 2: new front rises from ghost position naturally
-                    transform:
-                      stackPos === 0 && isExiting
-                        ? "rotate(-7deg) scale(0.88) translateY(-12px)"
-                        : stackPos === 0
-                        ? "rotate(0deg) scale(1)"
-                        : stackPos === 1
-                        ? "rotate(-12.7762deg)"
-                        : "rotate(-27.7762deg)",
-                    opacity:
-                      stackPos === 0 && isExiting
-                        ? 0.2
-                        : stackPos === 0
-                        ? 1
-                        : stackPos === 1
-                        ? 0.75
-                        : 0.6,
-                    transition:
-                      stackPos === 0 && isExiting
-                        ? "transform 0.18s ease-in, opacity 0.18s ease-in"
-                        : "transform 0.38s cubic-bezier(0.2,0,0,1), opacity 0.38s ease-out",
-                    pointerEvents: isFront && !isExiting ? "auto" : "none",
+                    pointerEvents: isFront ? "auto" : "none",
+                    transformOrigin: "50% 50%",
                   }}
                 >
-                  {isFront && (
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "space-between",
-                        height: "100%",
-                        padding: 16,
-                      }}
-                    >
-                      {/* Tags row + swap button */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="rounded-full px-2.5 py-0.5 text-xs font-medium"
-                            style={getTagStyle(cardRec.session.tag)}
-                          >
-                            {cardRec.session.tag}
-                          </span>
-                          <span className="text-xs text-fitto-muted">
-                            {cardRec.session.durationMin} min
-                          </span>
-                        </div>
-                        {/* Swap button — circle with exchange icon */}
-                        <button
-                          onClick={handleSwap}
-                          disabled={isExiting}
-                          aria-label="Try another suggestion"
-                          style={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: "50%",
-                            backgroundColor: "#F7F4ED",
-                            border: "none",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            cursor: "pointer",
-                            boxShadow: "none",
-                            opacity: isExiting ? 0.4 : 1,
-                            transition: "opacity 0.2s",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M3.01514 9.79652V11.6055C3.01502 12.0806 3.1085 12.551 3.29023 12.99C3.47196 13.4289 3.73837 13.8278 4.07427 14.1638C4.41016 14.4997 4.80895 14.7662 5.24785 14.9481C5.68676 15.1299 6.15718 15.2235 6.63226 15.2235H17.4836M3.01514 5.2749H13.8665C14.3417 5.27479 14.8122 5.3683 15.2512 5.55008C15.6902 5.73186 16.0891 5.99835 16.4251 6.33433C16.761 6.67032 17.0275 7.0692 17.2093 7.50821C17.3911 7.94721 17.4846 8.41773 17.4845 8.89288V10.701" stroke="#526037" strokeWidth="1.28115" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M14.7709 12.51L17.4844 15.2226L14.7709 17.9361M5.72764 7.98837L3.01416 5.27489L5.72764 2.56226" stroke="#526037" strokeWidth="1.28115" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </button>
-                      </div>
-
-                      {/* Title + description */}
-                      <div>
-                        <h3 className="text-xl font-bold text-fitto-text">
-                          {cardRec.session.title}
-                        </h3>
-                        <p className="mt-2 text-sm leading-relaxed text-fitto-muted">
-                          {cardRec.session.description}
-                        </p>
-                      </div>
-
-                      {/* CTA */}
-                      <Link
-                        href={`/session/${cardRec.session.id}`}
-                        className="block rounded-xl py-3.5 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                        style={{ backgroundColor: getTagStyle(cardRec.session.tag).color }}
+                  <AnimatePresence mode="wait">
+                    {isFront && (
+                      <motion.div
+                        key={recIndex}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.14 }}
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
+                          height: "100%",
+                          padding: 16,
+                        }}
                       >
-                        Begin when you&apos;re ready
-                      </Link>
-                    </div>
-                  )}
-                </div>
+                        {/* Tags row + swap button */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="rounded-full px-2.5 py-0.5 text-xs font-medium"
+                              style={getTagStyle(cardRec.session.tag)}
+                            >
+                              {cardRec.session.tag}
+                            </span>
+                            <span className="text-xs text-fitto-muted">
+                              {cardRec.session.durationMin} min
+                            </span>
+                          </div>
+                          {/* Swap button */}
+                          <button
+                            onClick={handleSwap}
+                            disabled={isAnimating}
+                            aria-label="Try another suggestion"
+                            style={{
+                              width: 40,
+                              height: 40,
+                              borderRadius: "50%",
+                              backgroundColor: "#F7F4ED",
+                              border: "none",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              cursor: isAnimating ? "default" : "pointer",
+                              boxShadow: "none",
+                              opacity: isAnimating ? 0.4 : 1,
+                              transition: "opacity 0.2s",
+                              flexShrink: 0,
+                            }}
+                          >
+                            <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M3.01514 9.79652V11.6055C3.01502 12.0806 3.1085 12.551 3.29023 12.99C3.47196 13.4289 3.73837 13.8278 4.07427 14.1638C4.41016 14.4997 4.80895 14.7662 5.24785 14.9481C5.68676 15.1299 6.15718 15.2235 6.63226 15.2235H17.4836M3.01514 5.2749H13.8665C14.3417 5.27479 14.8122 5.3683 15.2512 5.55008C15.6902 5.73186 16.0891 5.99835 16.4251 6.33433C16.761 6.67032 17.0275 7.0692 17.2093 7.50821C17.3911 7.94721 17.4846 8.41773 17.4845 8.89288V10.701" stroke="#526037" strokeWidth="1.28115" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M14.7709 12.51L17.4844 15.2226L14.7709 17.9361M5.72764 7.98837L3.01416 5.27489L5.72764 2.56226" stroke="#526037" strokeWidth="1.28115" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </button>
+                        </div>
+
+                        {/* Title + description */}
+                        <div>
+                          <h3 className="text-xl font-bold text-fitto-text">
+                            {cardRec.session.title}
+                          </h3>
+                          <p className="mt-2 text-sm leading-relaxed text-fitto-muted">
+                            {cardRec.session.description}
+                          </p>
+                        </div>
+
+                        {/* CTA */}
+                        <Link
+                          href={`/session/${cardRec.session.id}`}
+                          className="block rounded-xl py-3.5 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                          style={{ backgroundColor: getTagStyle(cardRec.session.tag).color }}
+                        >
+                          Begin when you&apos;re ready
+                        </Link>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
               );
             })}
           </div>
