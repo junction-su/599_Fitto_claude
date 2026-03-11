@@ -379,13 +379,12 @@ export default function HomePage() {
           Your Journey
         </h2>
         <div
-          className="grid grid-cols-[120px_1fr] rounded-2xl p-3"
-          style={{ backgroundColor: "#F5EFE6" }}
+          className="grid grid-cols-[120px_1fr] rounded-2xl bg-fitto-card p-3"
         >
           {/* Left column: streak card spanning both rows */}
           <div
-            className="row-span-2 mr-3 flex flex-col items-center justify-center rounded-xl"
-            style={{ backgroundColor: "#EDE3D6", marginTop: 1 }}
+            className="row-span-2 mr-3 flex flex-col items-center justify-center rounded-xl bg-fitto-bg"
+            style={{ marginTop: 1 }}
           >
             {/* Flame + glow */}
             <div className="relative flex items-center justify-center">
@@ -463,7 +462,7 @@ export default function HomePage() {
           </div>
 
           {/* Right column, row 2: compact weekly strip */}
-          <div className="mt-1.5 rounded-lg px-2 py-1.5" style={{ backgroundColor: "#EDE3D6" }}>
+          <div className="mt-1.5 rounded-lg bg-fitto-bg px-2 py-1.5">
             <div className="flex justify-between">
               {rhythm.map((day) => {
                 const hasDone = day.done > 0;
