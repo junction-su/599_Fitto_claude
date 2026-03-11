@@ -385,7 +385,7 @@ export default function HomePage() {
           {/* Left column: streak card spanning both rows */}
           <div
             className="row-span-2 mr-3 flex flex-col items-center justify-center rounded-xl bg-fitto-bg py-4"
-            style={{ marginTop: 2, marginBottom: 2 }}
+            style={{ marginTop: 1, marginBottom: 1 }}
           >
             {/* Flame + glow */}
             <div className="relative flex items-center justify-center">
@@ -465,7 +465,7 @@ export default function HomePage() {
 
           {/* Right column, row 2: compact weekly strip */}
           <div className="mt-1.5 rounded-lg bg-fitto-bg px-2 py-1.5">
-            <div className="flex justify-between">
+            <div className="flex items-center justify-between">
               {rhythm.map((day) => {
                 const hasDone = day.done > 0;
                 const hasSkip = day.skip > 0 && !hasDone;
