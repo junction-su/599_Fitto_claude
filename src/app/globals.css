@@ -12,7 +12,9 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .animate-blob-1,
   .animate-blob-2,
-  .animate-blob-3 {
+  .animate-blob-3,
+  .animate-flame-breathe,
+  .animate-flame-glow {
     animation: none !important;
   }
 }

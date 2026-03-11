@@ -151,24 +151,24 @@ export default function HomePage() {
   const rhythm = getRhythmLast7Days(state.events);
   const streak = getStreakInfo(state.events);
 
-  // State-based streak copy
+  // State-based streak copy (number lives in left card only — right side is emotional)
   const streakCopy = (() => {
     if (streak.lastEventWasSkip && streak.count > 0) {
-      return { title: "Your streak paused.", body: "We'll help you restart gently." };
+      return { title: "Your streak paused.", body: "We\u2019ll help you restart gently." };
     }
     if (streak.lastEventWasSkip && streak.count === 0) {
-      return { title: "That's okay.", body: "Rest is part of the rhythm." };
+      return { title: "That\u2019s okay.", body: "Rest is part of the rhythm." };
     }
     if (streak.count >= 7) {
-      return { title: `${streak.count} day streak`, body: "Your rhythm is getting stronger." };
+      return { title: "Your rhythm is getting stronger.", body: "Small steps are adding up." };
     }
     if (streak.count >= 2) {
-      return { title: `${streak.count} day streak`, body: "Consistency builds gradually." };
+      return { title: "You showed up again.", body: "Consistency builds gradually." };
     }
     if (streak.count === 1) {
       return { title: "You showed up today.", body: "A gentle start still counts." };
     }
-    return { title: "Your journey starts here.", body: "Pick your energy level and begin." };
+    return { title: "Start with what feels doable.", body: "Small steps still count." };
   })();
 
   return (
@@ -378,64 +378,70 @@ export default function HomePage() {
         <h2 className="mb-3 text-lg font-semibold text-fitto-text">
           Your Journey
         </h2>
-        <div className="overflow-hidden rounded-2xl bg-fitto-card">
-          {/* Streak card — icon left, copy right */}
-          <div className="flex items-stretch">
-            {/* Left: streak icon block */}
-            <div className="relative flex w-28 shrink-0 flex-col items-center justify-center bg-fitto-accent/[0.07] py-5">
-              {/* Subtle glow behind flame */}
-              {streak.count > 0 && (
-                <span
-                  className="pointer-events-none absolute left-1/2 top-1/3 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full"
-                  style={{
-                    background:
-                      "radial-gradient(circle, rgba(111,125,90,0.25) 0%, transparent 70%)",
-                    filter: "blur(12px)",
-                  }}
-                />
-              )}
-              {/* Flame icon */}
+        <div className="rounded-2xl bg-fitto-card p-5">
+          {/* Top row: compact streak card + encouragement */}
+          <div className="flex items-center gap-4">
+            {/* Compact streak card */}
+            <div className="relative flex w-[72px] shrink-0 flex-col items-center rounded-xl bg-fitto-bg/80 py-3.5">
+              {/* Subtle glow pulse behind flame */}
+              <span
+                className={`pointer-events-none absolute left-1/2 top-5 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full ${
+                  streak.count > 0 ? "animate-flame-glow" : ""
+                }`}
+                style={{
+                  background:
+                    streak.count > 0
+                      ? "radial-gradient(circle, rgba(111,125,90,0.3) 0%, transparent 70%)"
+                      : "none",
+                  filter: "blur(8px)",
+                }}
+              />
+              {/* Clean minimal flame SVG */}
               <svg
                 viewBox="0 0 24 24"
-                className={`relative h-9 w-9 transition-colors ${
+                className={`relative h-6 w-6 ${
                   streak.count > 0
-                    ? "text-fitto-accent"
-                    : "text-fitto-muted/40"
+                    ? "animate-flame-breathe text-fitto-accent"
+                    : "text-fitto-muted/30"
                 }`}
-                fill="currentColor"
+                fill="none"
               >
-                <path d="M12 23c-4.97 0-8-3.03-8-7.5 0-3.09 1.74-5.64 3.28-7.35a.75.75 0 0 1 1.22.2c.53 1.12 1.32 2.04 2.18 2.6.12-.9.42-2.1 1.2-3.33C13.2 5.4 15.08 3.6 18.04 2a.75.75 0 0 1 1.1.75c-.3 2.1-.02 3.72.62 5.03.62 1.27 1.56 2.2 2.36 2.97.14.14.22.33.22.53 0 .11-.02.21-.06.31C21.42 14.14 20 17.5 20 17.5c0 2.97-3.03 5.5-8 5.5Zm-1.5-8.5c0 1.77.73 2.87 1.5 3.46.77-.59 1.5-1.69 1.5-3.46 0-.97-.36-1.83-.78-2.53a7.1 7.1 0 0 1-.72 1.03.75.75 0 0 1-1.22-.2 6.52 6.52 0 0 1-.28-.7c-.12.56-.2 1.26-.2 2.4h.2Z" />
+                <path
+                  d="M12 2C12 2 9.5 7.5 9.5 11c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5C14.5 7.5 12 2 12 2Z"
+                  fill="currentColor"
+                  opacity="0.5"
+                />
+                <path
+                  d="M12 22c-3.87 0-7-2.69-7-6.5 0-3.05 2.13-6.16 4.1-8.27a.5.5 0 0 1 .82.14c.6 1.32 1.5 2.34 2.36 2.9.22-.96.72-2.32 1.55-3.65C15.04 4.62 16.6 3.2 19 2a.5.5 0 0 1 .7.56c-.28 1.9-.08 3.42.48 4.66.55 1.2 1.4 2.1 2.16 2.82a.5.5 0 0 1 .1.55C21.72 12.4 20 15.5 20 15.5c0 3.31-3.13 6.5-8 6.5Z"
+                  fill="currentColor"
+                />
               </svg>
-              {/* Count */}
-              <p className="relative mt-1.5 text-center">
-                <span
-                  className={`text-xl font-bold ${
-                    streak.count > 0
-                      ? "text-fitto-text"
-                      : "text-fitto-muted/50"
-                  }`}
-                >
-                  {streak.count}
-                </span>
-                <span className="ml-1 text-xs text-fitto-muted">
-                  {streak.count === 1 ? "day" : "days"}
-                </span>
-              </p>
+              {/* Streak number */}
+              <span
+                className={`relative mt-1 text-xl font-bold leading-tight ${
+                  streak.count > 0 ? "text-fitto-text" : "text-fitto-muted/40"
+                }`}
+              >
+                {streak.count}
+              </span>
+              <span className="relative text-[10px] text-fitto-muted">
+                {streak.count === 1 ? "day" : "days"}
+              </span>
             </div>
 
-            {/* Right: encouragement copy */}
-            <div className="flex flex-col justify-center px-5 py-5">
-              <h3 className="text-base font-bold text-fitto-text">
+            {/* Encouragement copy (no streak number repeated) */}
+            <div className="min-w-0 flex-1">
+              <h3 className="text-[15px] font-bold leading-snug text-fitto-text">
                 {streakCopy.title}
               </h3>
-              <p className="mt-1 text-sm text-fitto-muted">
+              <p className="mt-0.5 text-sm leading-relaxed text-fitto-muted">
                 {streakCopy.body}
               </p>
             </div>
           </div>
 
           {/* Weekly progress row */}
-          <div className="border-t border-fitto-muted/10 px-4 py-3.5">
+          <div className="mt-4 rounded-xl bg-fitto-bg/60 px-3 py-2.5">
             <div className="flex justify-between">
               {rhythm.map((day) => {
                 const hasDone = day.done > 0;
@@ -448,24 +454,24 @@ export default function HomePage() {
                 return (
                   <div
                     key={day.date}
-                    className="flex flex-col items-center gap-1.5"
+                    className="flex flex-col items-center gap-1"
                   >
                     <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${
                         hasDone
                           ? "bg-fitto-accent"
                           : hasSkip
-                          ? "bg-fitto-muted/20"
-                          : "bg-fitto-bg"
+                          ? "bg-fitto-muted/15"
+                          : "bg-fitto-card"
                       }`}
                       title={`${day.date}: ${day.done} done, ${day.skip} skipped`}
                     >
                       {hasDone && (
                         <svg
-                          className="h-4 w-4 text-white"
+                          className="h-3.5 w-3.5 text-white"
                           fill="none"
                           viewBox="0 0 24 24"
-                          strokeWidth={2.5}
+                          strokeWidth={3}
                           stroke="currentColor"
                         >
                           <path
@@ -476,7 +482,7 @@ export default function HomePage() {
                         </svg>
                       )}
                     </div>
-                    <span className="text-[10px] font-medium text-fitto-muted">
+                    <span className="text-[9px] font-medium text-fitto-muted/70">
                       {dayLabel}
                     </span>
                   </div>

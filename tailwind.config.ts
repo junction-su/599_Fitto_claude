@@ -34,11 +34,21 @@ const config: Config = {
           "33%": { transform: "translate(15px, 20px) scale(0.95)" },
           "66%": { transform: "translate(-25px, -15px) scale(1.1)" },
         },
+        "flame-breathe": {
+          "0%, 100%": { transform: "translateY(0) scale(1)", opacity: "0.9" },
+          "50%": { transform: "translateY(-1.5px) scale(1.04)", opacity: "1" },
+        },
+        "flame-glow": {
+          "0%, 100%": { opacity: "0.25", transform: "scale(1)" },
+          "50%": { opacity: "0.4", transform: "scale(1.08)" },
+        },
       },
       animation: {
         "blob-1": "blob-float-1 22s ease-in-out infinite",
         "blob-2": "blob-float-2 26s ease-in-out infinite",
         "blob-3": "blob-float-3 18s ease-in-out infinite",
+        "flame-breathe": "flame-breathe 3.2s ease-in-out infinite",
+        "flame-glow": "flame-glow 3.2s ease-in-out infinite",
       },
     },
   },
